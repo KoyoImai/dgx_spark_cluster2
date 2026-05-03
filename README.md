@@ -278,3 +278,26 @@ mprg@spark-07a2:~/Desktop$ ip a show enP7s7
 mprg@spark-07a2:~/Desktop$
 ```
 
+
+### `/etc/hosts`の設定
+まず管理者nodeで`/etc/hosts`を確認します。
+```
+mprg@spark-3894:~/Desktop$ cat /etc/hosts
+127.0.0.1       localhost
+127.0.0.1       spark-3894  
+
+mprg@spark-3894:~/Desktop$ 
+```
+node間でnode名が解決できるように`/etc/hosts`を設定します。
+以下のコマンドを実行してください。
+```
+sudo bash -c 'cat >> /etc/hosts << EOF
+
+# DGX Spark cluster
+10.0.0.8    node8
+10.0.0.15   node15
+10.0.0.16   node16
+10.0.0.17   node17
+10.0.0.18   node18
+EOF'
+```
