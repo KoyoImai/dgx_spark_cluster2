@@ -1,7 +1,8 @@
 ## ステップ４：QSFPの2台接続
-まず、QSFPケーブルで2台のDGX Sparkを接続してください。
+QSFPケーブルで2台のDGX Sparkを接続してください。
 ここでは、node15とnode16を接続して作業を勧めていきます。
 
+### node15でip固定
 QSFPケーブルで2台のDGX Sparkを接続したら、ネットワークインターフェースの設定を行います。
 NVIDIA公式に従って、自動IP割り当てで設定します。
 まず、2台が接続できているかを、以下のコマンドで確認してください。
@@ -29,3 +30,19 @@ EOF
 sudo chmod 600 /etc/netplan/40-cx7.yaml
 sudo netplan apply
 ```
+ipアドレスが正しく設定されているかを確認します。
+`ip a show enp1s0f0np0`を実行して設定を確認します。
+```
+mprg@spark-fb97:~$ ip a show enp1s0f0np0
+3: enp1s0f0np0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 4c:bb:47:2f:fb:98 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.1.1/24 brd 10.0.1.255 scope global noprefixroute enp1s0f0np0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::4ebb:47ff:fe2f:fb98/64 scope link 
+       valid_lft forever preferred_lft forever
+mprg@spark-fb97:~$ 
+```
+上記の結果から`enp1s0f0np0`インターフェースのipが`10.0.1.1`に設定されていることが確認できます。
+
+### node16でip固定
+続いてnode16でもip固定を行います。
