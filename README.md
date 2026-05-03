@@ -21,4 +21,4 @@
 
 **[ステップ３：NAT（インターネット接続の共有）の設定](https://github.com/KoyoImai/dgx_spark_cluster2/blob/main/Step3/README.md)**
 
-**[ステップ４：QSFPの2台接続]()**
+**[ステップ４：QSFPの2台接続](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step4)**
