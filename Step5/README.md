@@ -248,3 +248,20 @@ PING 10.0.4.1 (10.0.4.1) 56(84) bytes of data.
 3 packets transmitted, 3 received, 0% packet loss, time 2004ms
 rtt min/avg/max/mdev = 0.924/1.198/1.470/0.222 ms
 ```
+
+## `/etc/hostsの設定追記`
+全てのnodeで以下の内容を`/etc/hosts`に追加してください。
+```
+sudo bash -c 'cat >> /etc/hosts << EOF
+
+# QSFP high-speed network
+10.0.1.1   node15-qsfp1
+10.0.1.2   node16-qsfp1
+10.0.2.1   node17-qsfp1
+10.0.2.2   node18-qsfp1
+10.0.3.1   node15-qsfp2
+10.0.3.2   node17-qsfp2
+10.0.4.1   node16-qsfp2
+10.0.4.2   node18-qsfp2
+EOF'
+```
