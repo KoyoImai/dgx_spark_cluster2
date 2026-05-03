@@ -287,6 +287,7 @@ sudo bash -c 'cat >> /etc/hosts << EOF
 EOF'
 ```
 一応`ssh mprg@nodexx`でssh接続できるかを確かめてください。
+確認が完了したら、各計算用nodeでも同様に`/etc/hosts`を設定してください。
 
 ### ssh鍵の生成と共有
 ssh鍵の生成と共有を行います。
