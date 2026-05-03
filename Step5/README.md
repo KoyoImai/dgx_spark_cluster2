@@ -37,7 +37,7 @@ rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
 rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
 mprg@spark-fb97:~$ 
 ```
-`enP2p1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
+`enp1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
 以下のコマンドをnode15で実行してください。
 ```
 sudo tee /etc/netplan/41-cx7-p2.yaml > /dev/null <<EOF
@@ -79,7 +79,7 @@ rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
 rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
 mprg@spark-755c:~$ 
 ```
-`enP2p1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
+`enp1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
 以下のコマンドをnode17で実行してください。
 ```
 sudo tee /etc/netplan/41-cx7-p2.yaml > /dev/null <<EOF
@@ -121,7 +121,7 @@ rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
 rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
 mprg@spark-4440:~$
 ```
-`enP2p1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
+`enp1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
 以下のコマンドをnode16で実行してください。
 ```
 sudo tee /etc/netplan/41-cx7-p2.yaml > /dev/null <<EOF
@@ -164,7 +164,7 @@ rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
 rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
 mprg@spark-07a2:~$
 ```
-`enP2p1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
+`enp1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
 以下のコマンドをnode18で実行してください。
 ```
 sudo tee /etc/netplan/41-cx7-p2.yaml > /dev/null <<EOF
