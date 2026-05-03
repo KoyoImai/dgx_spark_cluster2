@@ -62,3 +62,9 @@ NFSサーバーを起動・有効化します。
 sudo systemctl restart nfs-server
 sudo systemctl enable nfs-server
 ```
+確認を行います。
+```
+mprg@spark-3894:~$ sudo exportfs -v
+/home4cluster 	10.0.0.0/24(sync,wdelay,hide,no_subtree_check,sec=sys,rw,secure,no_root_squash,no_all_squash)
+
+```
