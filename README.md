@@ -27,7 +27,7 @@
 
 ## LLMの学習＆推論
 
-**[ステップ６：LLMの学習](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step6)**
+**[ステップ６：LLMの学習（???+LoRA）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step6)**
 
 **[ステップ７：LLMの推論](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step7)**
 
