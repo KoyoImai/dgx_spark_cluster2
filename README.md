@@ -317,3 +317,4 @@ ssh-copy-id -i ~/.ssh/id_ed25519.pub mprg@node16
 ssh-copy-id -i ~/.ssh/id_ed25519.pub mprg@node17
 ssh-copy-id -i ~/.ssh/id_ed25519.pub mprg@node18
 ```
+これで管理者nodeから計算用nodeへのssh接続はパスワードなしで可能になります。
