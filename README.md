@@ -17,4 +17,10 @@
 ## クラスタ構築
 **[ステップ１：ipアドレスの固定](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step1)**
 
-## ステップ２：
+## ステップ２：NFSサーバーのインストール
+NFSサーバーをインストールすることで、管理者nodeの/home4clusterディレクトリを全計算nodeから同じパスで共有できるようになります。モデルファイルやスクリプトを1か所に置くだけで全nodeから使えるようになります。
+まず管理者nodeでNFSサーバーをインストールします。
+以下のコマンドを実行してください。
+```
+sudo apt install -y nfs-kernel-server
+```
