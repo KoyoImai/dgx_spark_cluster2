@@ -302,3 +302,18 @@ sudo bash -c 'cat >> /etc/hosts << EOF
 EOF'
 ```
 一応`ssh mprg@nodexx`でssh接続できるかを確かめてください。
+
+### ssh鍵の生成と共有
+ssh鍵の生成と共有を行います。
+これによって、node間でパスワードなしでssh接続ができるようになります。
+管理者nodeで以下を実行してください。
+```
+ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519
+```
+その後以下を実行してください。
+```
+ssh-copy-id -i ~/.ssh/id_ed25519.pub mprg@node15
+ssh-copy-id -i ~/.ssh/id_ed25519.pub mprg@node16
+ssh-copy-id -i ~/.ssh/id_ed25519.pub mprg@node17
+ssh-copy-id -i ~/.ssh/id_ed25519.pub mprg@node18
+```
