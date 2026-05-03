@@ -24,3 +24,18 @@ NFSサーバーをインストールすることで、管理者nodeの/home4clus
 ```
 sudo apt install -y nfs-kernel-server
 ```
+インストールが完了したら、各nodeで共有するディレクトリを作成します。
+```
+sudo mkdir -p /home4cluster
+sudo chmod 777 /home4cluster
+```
+ディレクトリを作成したら、NFSの共有設定を行います。
+`/etc/exports`に共有設定を追記します。
+
+```
+sudo bash -c 'cat >> /etc/exports << EOF
+
+### NFS Mount of Cluster Home
+/home4cluster 10.0.0.0/24(rw,sync,no_subtree_check,no_root_squash)
+EOF'
+```
