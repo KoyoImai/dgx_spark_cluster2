@@ -95,3 +95,7 @@ mprg@spark-3894:~/Desktop$ ip a show enx6c6e0705ec11
        valid_lft forever preferred_lft forever
 mprg@spark-3894:~/Desktop$ 
 ```
+
+
+### 計算用nodeでipアドレスを固定
+`nmcli con show`を実行し
