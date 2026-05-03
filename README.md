@@ -301,3 +301,4 @@ sudo bash -c 'cat >> /etc/hosts << EOF
 10.0.0.18   node18
 EOF'
 ```
+一応`ssh mprg@nodexx`でssh接続できるかを確かめてください。
