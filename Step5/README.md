@@ -194,7 +194,32 @@ mprg@spark-07a2:~$
 ```
 
 
+## 接続確認
+### node15 ⇔ node17
+node15で`ping -c 3 10.0.3.2`を実行して接続できるかを確認します。
+```
+mprg@spark-fb97:~$ ping -c 3 10.0.3.2
+PING 10.0.3.2 (10.0.3.2) 56(84) bytes of data.
+64 bytes from 10.0.3.2: icmp_seq=1 ttl=64 time=1.40 ms
+64 bytes from 10.0.3.2: icmp_seq=2 ttl=64 time=1.27 ms
+64 bytes from 10.0.3.2: icmp_seq=3 ttl=64 time=1.24 ms
 
+--- 10.0.3.2 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+rtt min/avg/max/mdev = 1.239/1.302/1.400/0.069 ms
+```
 
+node17で`ping -c 3 10.0.3.1`を実行して接続できるかを確認します。
+```
+mprg@spark-755c:~$ ping -c 3 10.0.3.1
+PING 10.0.3.1 (10.0.3.1) 56(84) bytes of data.
+64 bytes from 10.0.3.1: icmp_seq=1 ttl=64 time=0.680 ms
+64 bytes from 10.0.3.1: icmp_seq=2 ttl=64 time=0.707 ms
+64 bytes from 10.0.3.1: icmp_seq=3 ttl=64 time=0.848 ms
 
+--- 10.0.3.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2031ms
+rtt min/avg/max/mdev = 0.680/0.745/0.848/0.073 ms
+```
 
+### node16 ⇔ node18
