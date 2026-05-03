@@ -25,6 +25,8 @@
 
 **[ステップ５：QSFPの4台接続（2ペア＋クロス接続）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step5)**
 
+## LLMの学習＆推論
+
 **[ステップ６：LLMの学習](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step6)**
 
 **[ステップ７：LLMの推論](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step7)**
