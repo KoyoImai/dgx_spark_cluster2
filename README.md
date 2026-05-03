@@ -83,3 +83,15 @@ mprg@spark-3894:~/Desktop$ sudo nmcli con up "cluster-internal"
 接続が正常にアクティベートされました (D-Bus アクティブパス: /org/freedesktop/NetworkManager/ActiveConnection/7793)
 mprg@spark-3894:~/Desktop$
 ```
+これで管理者nodeのip固定が完了したと思います。
+以下のようなコマンドを実行してipアドレスが固定されていることを確認してください。
+```
+mprg@spark-3894:~/Desktop$ ip a show enx6c6e0705ec11
+11: enx6c6e0705ec11: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 6c:6e:07:05:ec:11 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.8/24 brd 10.0.0.255 scope global noprefixroute enx6c6e0705ec11
+       valid_lft forever preferred_lft forever
+    inet6 fe80::545d:10c:f7f9:dc01/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+mprg@spark-3894:~/Desktop$ 
+```
