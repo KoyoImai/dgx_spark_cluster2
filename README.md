@@ -126,4 +126,31 @@ sudo iptables -t nat -A POSTROUTING -o enP7s7 -j MASQUERADE
 sudo iptables -A FORWARD -i enx6c6e0705ec11 -o enP7s7 -j ACCEPT
 sudo iptables -A FORWARD -i enP7s7 -o enx6c6e0705ec11 -m state --state RELATED,ESTABLISHED -j ACCEPT
 ```
+この設定を再起動後も維持できるよう永続化します。
+```
+sudo apt install -y iptables-persistent
+sudo netfilter-persistent save
+```
+途中でipv4とipv6の設定について聞かれます。ipv4は「はい」、ipv6は「いいえ」で勧めてください。
+次にiptables-persistentの保存を実行します。
+```
+sudo netfilter-persistent save
+```
+結果は以下のようになります。
+```
+mprg@spark-3894:~/Desktop$ sudo netfilter-persistent save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/15-ip4tables save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/25-ip6tables save
+mprg@spark-3894:~/Desktop$ 
+```
+正常に保存されました。
+次に計算node側でデフォルトゲートウェイを管理者node（10.0.0.8）に設定します。
+これにより計算nodeのインターネット通信が管理者node経由で行われるようになります。
+以下のコマンドを全ての計算用nodeで実行してください。
+```
+sudo nmcli con mod "有線接続 3" \
+  ipv4.gateway "10.0.0.8" \
+  ipv4.dns "8.8.8.8"
 
+sudo nmcli con up "有線接続 3"
+```
