@@ -97,7 +97,7 @@ mprg@spark-3894:~/Desktop$
 ```
 
 
-### 計算用nodeでipアドレスを固定
+### 計算用node15でipアドレスを固定
 `nmcli con show`を実行し、現在のインターフェース名を確認します。
 ```
 mprg@spark-fb97:~/Desktop$ nmcli con show
@@ -125,5 +125,17 @@ mprg@spark-fb97:~/Desktop$ sudo nmcli con mod "有線接続 3" \
 [sudo] mprg のパスワード: 
 mprg@spark-fb97:~/Desktop$ sudo nmcli con up "有線接続 3"
 接続が正常にアクティベートされました (D-Bus アクティブパス: /org/freedesktop/NetworkManager/ActiveConnection/15844)
+mprg@spark-fb97:~/Desktop$ 
+```
+最後にipアドレスが固定されているかを確認します。
+```
+mprg@spark-fb97:~/Desktop$ ip a show enP7s7
+2: enP7s7: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 4c:bb:47:2f:fb:97 brd ff:ff:ff:ff:ff:ff
+    altname enP7p1s0
+    inet 10.0.0.15/24 brd 10.0.0.255 scope global noprefixroute enP7s7
+       valid_lft forever preferred_lft forever
+    inet6 fe80::b487:3457:e80:a948/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
 mprg@spark-fb97:~/Desktop$ 
 ```
