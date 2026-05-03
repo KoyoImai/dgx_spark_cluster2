@@ -113,7 +113,7 @@ docker0     42bb5e29-3ae7-46c8-bb13-ddca370ded0e  bridge    docker0
 mprg@spark-fb97:~/Desktop$ 
 ```
 `有線接続 3`が`enP7s7（内蔵RJ45）`に対応しています。
-もし有線接続1~5のどれがenP7s7（RJ45）に対応しているかわからない場合、nmcli con show "有線接続 x" | grep interfaceを実行して確認してください。
+もし有線接続1~5のどれがenP7s7（RJ45）に対応しているかわからない場合、`nmcli con show "有線接続 x" | grep interface`を実行して確認してください。
 これにIPを固定します。
 以下を実行してください。
 ```
@@ -158,7 +158,7 @@ docker0     8548a3df-3aef-42cc-aef3-c2a00d3c05d7  bridge    docker0
 mprg@spark-4440:~/Desktop$
 ```
 `有線接続 3`が`enP7s7（内蔵RJ45）`に対応しています。
-もし有線接続1~5のどれがenP7s7（RJ45）に対応しているかわからない場合、nmcli con show "有線接続 x" | grep interfaceを実行して確認してください。
+もし有線接続1~5のどれがenP7s7（RJ45）に対応しているかわからない場合、`nmcli con show "有線接続 x" | grep interface`を実行して確認してください。
 これにIPを固定します。
 以下を実行してください。
 ```
@@ -186,6 +186,48 @@ mprg@spark-4440:~/Desktop$ ip a show enP7s7
 mprg@spark-4440:~/Desktop$ 
 ```
 
-### 計算用node17~18でipアドレスを固定
-計算用node17-18のipアドレス固定はnode15-16と同じ手順で実行します。
-
+### 計算用node17でipアドレスを固定
+計算用node17のipアドレス固定はnode15-16と同じ手順で実行します。
+`nmcli con show`を実行し、現在のインターフェース名を確認します。
+```
+mprg@spark-755c:~/Desktop$ nmcli con show
+NAME        UUID                                  TYPE      DEVICE  
+MPRG        e1a14021-f068-4ce8-b97b-7b85de4f9788  wifi      wlP9s9  
+有線接続 3  c5a2e270-52e4-337e-9b61-97e50407c434  ethernet  enP7s7  
+lo          bad9e95d-51f0-4271-a1d9-f54a0b57b330  loopback  lo      
+docker0     f34cdb96-d3b6-4ecb-8d9a-55222494db48  bridge    docker0 
+有線接続 1  9d19d00d-7fc7-3080-9f46-f31adc2abd1c  ethernet  --      
+有線接続 2  43e7ad4b-eea4-3f55-b78a-e8b6a3ac124f  ethernet  --      
+有線接続 4  e7a74228-4663-3d9a-8ef8-7534a8eccc75  ethernet  --      
+有線接続 5  9f4db453-56ef-3162-b64d-45c51c870146  ethernet  --      
+mprg@spark-755c:~/Desktop$ nmcli con show "有線接続 3" | grep interface
+connection.interface-name:              enP7s7
+mprg@spark-755c:~/Desktop$ 
+```
+`有線接続 3`が`enP7s7（内蔵RJ45）`に対応しています。
+これにIPを固定します。
+以下を実行してください。
+```
+mprg@spark-755c:~/Desktop$ sudo nmcli con mod "有線接続 3" \
+  connection.interface-name enP7s7 \
+  ipv4.method manual \
+  ipv4.addresses 10.0.0.17/24 \
+  ipv4.gateway "" \
+  ipv4.dns ""
+[sudo] mprg のパスワード: 
+mprg@spark-755c:~/Desktop$ sudo nmcli con up "有線接続 3"
+接続が正常にアクティベートされました (D-Bus アクティブパス: /org/freedesktop/NetworkManager/ActiveConnection/8466)
+mprg@spark-755c:~/Desktop$ 
+```
+最後にipアドレスが固定されているかを確認します。
+```
+mprg@spark-755c:~/Desktop$ ip a show enP7s7
+2: enP7s7: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 4c:bb:47:2a:75:5c brd ff:ff:ff:ff:ff:ff
+    altname enP7p1s0
+    inet 10.0.0.17/24 brd 10.0.0.255 scope global noprefixroute enP7s7
+       valid_lft forever preferred_lft forever
+    inet6 fe80::1f25:6f31:a658:22ba/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+mprg@spark-755c:~/Desktop$ 
+```
