@@ -113,6 +113,7 @@ docker0     42bb5e29-3ae7-46c8-bb13-ddca370ded0e  bridge    docker0
 mprg@spark-fb97:~/Desktop$ 
 ```
 `有線接続 3`が`enP7s7（内蔵RJ45）`に対応しています。
+もし有線接続1~5のどれがenP7s7（RJ45）に対応しているかわからない場合、nmcli con show "有線接続 x" | grep interfaceを実行して確認してください。
 これにIPを固定します。
 以下を実行してください。
 ```
@@ -157,6 +158,7 @@ docker0     8548a3df-3aef-42cc-aef3-c2a00d3c05d7  bridge    docker0
 mprg@spark-4440:~/Desktop$
 ```
 `有線接続 3`が`enP7s7（内蔵RJ45）`に対応しています。
+もし有線接続1~5のどれがenP7s7（RJ45）に対応しているかわからない場合、nmcli con show "有線接続 x" | grep interfaceを実行して確認してください。
 これにIPを固定します。
 以下を実行してください。
 ```
