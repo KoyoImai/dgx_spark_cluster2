@@ -56,3 +56,9 @@ mprg@spark-3894:~$ cat /etc/exports
 ### NFS Mount of Cluster Home
 /home4cluster 10.0.0.0/24(rw,sync,no_subtree_check,no_root_squash)
 ```
+NFSサーバーを起動・有効化します。
+以下のコマンドを実行してください。
+```
+sudo systemctl restart nfs-server
+sudo systemctl enable nfs-server
+```
