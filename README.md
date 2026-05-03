@@ -14,7 +14,7 @@
 ・管理者nodeと計算用nodeをRJ45 Ethernet スイッチ経由で接続 \
 ・管理者nodeのみ研究室インターネットに接続しユーザーがログイン可能
 
-
+## クラスタ構築
 **[ステップ１：ipアドレスの固定](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step1)**
 
 ## ステップ２：
