@@ -233,7 +233,7 @@ mprg@spark-755c:~/Desktop$
 ```
 
 
-### 計算用node16でipアドレスを固定
+### 計算用node18でipアドレスを固定
 `nmcli con show`を実行し、現在のインターフェース名を確認します。
 ```
 mprg@spark-07a2:~/Desktop$ nmcli con show
