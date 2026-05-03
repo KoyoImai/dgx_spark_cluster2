@@ -59,5 +59,27 @@ mprg@spark-3894:~/Desktop$ ip a
     link/ether 6c:6e:07:05:ec:11 brd ff:ff:ff:ff:ff:ff
 mprg@spark-3894:~/Desktop$
 ```
-
-
+`enx6c6e0705ec11`がUSB-Cハブ経由のRJ45インターフェースです。
+`nmcli con show`で対応する接続名が出てないので、ネットワークを新規に接続します。
+以下を実行してください。
+```
+sudo nmcli con add \
+  type ethernet \
+  con-name "cluster-internal" \
+  ifname enx6c6e0705ec11 \
+  ipv4.method manual \
+  ipv4.addresses 10.0.0.8/24 \
+  ipv4.gateway "" \
+  ipv4.dns ""
+```
+上記のコマンドを実行する次のような出力が出ると思います。
+```
+接続 'cluster-internal' (2257ccd1-3a1c-42cb-92c7-21190bd84ef0) が正常に追加されました。
+```
+接続の作成が完了したので、この接続を有効にします。
+以下のようにコマンドを実行してください。
+```
+mprg@spark-3894:~/Desktop$ sudo nmcli con up "cluster-internal"
+接続が正常にアクティベートされました (D-Bus アクティブパス: /org/freedesktop/NetworkManager/ActiveConnection/7793)
+mprg@spark-3894:~/Desktop$
+```
