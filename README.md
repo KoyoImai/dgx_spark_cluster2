@@ -184,4 +184,6 @@ mprg@spark-4440:~/Desktop$ ip a show enP7s7
 mprg@spark-4440:~/Desktop$ 
 ```
 
+### 計算用node17~18でipアドレスを固定
+計算用node17~18のipアドレス固定はnode15~16と同じ手順で実行します。
 
