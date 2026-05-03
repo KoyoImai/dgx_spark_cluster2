@@ -223,3 +223,28 @@ rtt min/avg/max/mdev = 0.680/0.745/0.848/0.073 ms
 ```
 
 ### node16 ⇔ node18
+node16で`ping -c 3 10.0.4.2`を実行して接続できるかを確認します。
+```
+mprg@spark-4440:~$ ping -c 3 10.0.4.2
+PING 10.0.4.2 (10.0.4.2) 56(84) bytes of data.
+64 bytes from 10.0.4.2: icmp_seq=1 ttl=64 time=1.40 ms
+64 bytes from 10.0.4.2: icmp_seq=2 ttl=64 time=1.30 ms
+64 bytes from 10.0.4.2: icmp_seq=3 ttl=64 time=1.19 ms
+
+--- 10.0.4.2 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2005ms
+rtt min/avg/max/mdev = 1.187/1.295/1.397/0.085 ms
+```
+
+node18で`ping -c 3 10.0.4.1`を実行して接続できるかを確認します。
+```
+mprg@spark-07a2:~$ ping -c 3 10.0.4.1
+PING 10.0.4.1 (10.0.4.1) 56(84) bytes of data.
+64 bytes from 10.0.4.1: icmp_seq=1 ttl=64 time=0.924 ms
+64 bytes from 10.0.4.1: icmp_seq=2 ttl=64 time=1.20 ms
+64 bytes from 10.0.4.1: icmp_seq=3 ttl=64 time=1.47 ms
+
+--- 10.0.4.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+rtt min/avg/max/mdev = 0.924/1.198/1.470/0.222 ms
+```
