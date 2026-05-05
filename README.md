@@ -27,9 +27,11 @@
 
 ## LLMの学習＆推論
 
-**[ステップ６：LLMの学習（???+LoRA）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step6)**
+**[ステップ6：Dockerなどの環境構築](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step6)**
 
-**[ステップ７：LLMの推論](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step7)**
+**[ステップ7：LLMの学習（???+LoRA）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step7)**
+
+**[ステップ8：LLMの推論](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step8)**
 
 
 
