@@ -17,7 +17,12 @@ sudo usermod -aG docker mprg
 同様の手順で全ての計算nodeと管理者nodeでDockerグループに追加してください．
 
 
-## ステップ6.2：
+## ステップ6.2：Dockerイメージのpull
+まず，Dockerイメージのpullから行います．
+以下のコマンドを全ての計算nodeで実行してください．
+```
+docker pull nvcr.io/nvidia/pytorch:25.03-py3
+```
 
 
 
