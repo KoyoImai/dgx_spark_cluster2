@@ -93,9 +93,8 @@ for i in "${!NODES[@]}"; do
         -e NCCL_SOCKET_IFNAME=enP7s7 \
         -e NCCL_IB_DISABLE=1 \
         -e NCCL_NET=Socket \
-        -e NCCL_SHM_DISABLE=1 \
         -e NCCL_DEBUG=WARN \
-        nvcr.io/nvidia/pytorch:25.03-py3 \
+        pytorch-nccl-sm100:latest \
         torchrun \
         --nnodes=$NNODES \
         --nproc_per_node=$NPROC_PER_NODE \
