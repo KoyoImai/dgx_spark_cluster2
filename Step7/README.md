@@ -141,7 +141,7 @@ chmod +x /home4cluster/lora_train/run_1node.sh
 bash /home4cluster/lora_train/run_1node.sh
 ```
 
-##2node-LoRAチューニング(RJ45)
+## 2node-LoRAチューニング(RJ45)
 ```
 cat > /home4cluster/lora_train/run_2node_rj45.sh << 'EOF'
 #!/bin/bash
@@ -176,3 +176,38 @@ EOF
 chmod +x /home4cluster/lora_train/run_2node_rj45.sh
 ```
 
+## 2node-LoRAチューニング(QSFP)
+```
+cat > /home4cluster/lora_train/run_2node_qsfp.sh << 'EOF'
+#!/bin/bash
+
+MASTER_ADDR="10.0.1.1"
+MASTER_PORT="29500"
+NNODES=2
+NODES=("node15" "node16")
+
+for i in "${!NODES[@]}"; do
+    NODE=${NODES[$i]}
+    RANK=$i
+    ssh mprg@$NODE "docker run --rm --gpus all --network host \
+        --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+        -v /home4cluster:/home4cluster \
+        -v /home/mprg/nccl-build:/home/mprg/nccl-build \
+        -e LD_PRELOAD=/home/mprg/nccl-build/lib/libnccl.so \
+        -e NCCL_SOCKET_IFNAME=enp1s0f0np0 \
+        -e NCCL_IB_DISABLE=0 \
+        -e NCCL_IB_HCA=rocep1s0f0 \
+        nvcr.io/nvidia/pytorch:25.05-py3 \
+        bash -c 'pip install -q peft transformers && torchrun \
+            --nnodes=$NNODES \
+            --nproc_per_node=1 \
+            --master_addr=$MASTER_ADDR \
+            --master_port=$MASTER_PORT \
+            --node_rank=$RANK \
+            /home4cluster/lora_train/train.py'" &
+done
+wait
+EOF
+chmod +x /home4cluster/lora_train/run_2node_qsfp.sh
+bash /home4cluster/lora_train/run_2node_qsfp.sh
+```
