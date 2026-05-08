@@ -154,7 +154,65 @@ chmod +x ~/nccl-test-scripts/4node_rj45/run.sh
 
 
 ## ステップ6.6：torchrunによるPyTorchの分散学習テスト
+全ての計算nodeで以下のコマンドを実行してください．
+```
+docker pull nvcr.io/nvidia/pytorch:25.05-py3
+```
+ホストでビルドしたNCCLライブラリ（sm_121対応、shared memory制限を考慮したもの）をコンテナにマウントして使います．
+spark15で以下のコマンドを実行して動作を確認します．
+```
+docker run --rm --gpus all --network host \
+  --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+  -v /home/mprg/nccl-build:/home/mprg/nccl-build \
+  -e LD_PRELOAD=/home/mprg/nccl-build/lib/libnccl.so \
+  nvcr.io/nvidia/pytorch:25.05-py3 \
+  python3 -c "
+import torch
+import torch.distributed as dist
+import os
 
+os.environ['MASTER_ADDR'] = 'localhost'
+os.environ['MASTER_PORT'] = '29500'
+os.environ['RANK'] = '0'
+os.environ['WORLD_SIZE'] = '1'
+
+dist.init_process_group(backend='nccl')
+tensor = torch.ones(1).cuda()
+dist.all_reduce(tensor)
+print(f'single node NCCL test OK: {tensor.item()}')
+dist.destroy_process_group()
+"
+```
+
+
+### 2nodeテスト
+管理者nodeで以下のコマンドを実行してください．
+```
+mkdir -p /home4cluster/torchrun_test
+
+cat > /home4cluster/torchrun_test/nccl_test.py << 'EOF'
+import torch
+import torch.distributed as dist
+import os
+
+def main():
+    dist.init_process_group(backend="nccl")
+    rank = dist.get_rank()
+    world_size = dist.get_world_size()
+
+    torch.cuda.set_device(0)
+    tensor = torch.ones(1).cuda() * rank
+    print(f"[rank {rank}/{world_size}] before all_reduce: {tensor.item()}")
+
+    dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
+    print(f"[rank {rank}/{world_size}] after all_reduce: {tensor.item()}")
+
+    dist.destroy_process_group()
+
+if __name__ == "__main__":
+    main()
+EOF
+```
 
 
 
