@@ -145,10 +145,16 @@ mpirun -np 4 \
 EOF
 
 chmod +x ~/nccl-test-scripts/4node_rj45/run.sh
+```
 
 ### 4台-QSFP
+スイッチないと無理．
+```
 ```
 
-```
-```
+
+## ステップ6.6：torchrunによるPyTorchの分散学習テスト
+
+
+
 
