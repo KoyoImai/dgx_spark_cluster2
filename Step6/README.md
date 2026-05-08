@@ -117,4 +117,38 @@ mpirun -np 2 \
   /home/mprg/nccl-tests/build/all_reduce_perf -b 8 -e 256M -f 2 -g 1
 ```
 
+### 4台-RJ45
+```
+mkdir -p ~/nccl-test-scripts/4node_rj45
+
+cat > ~/nccl-test-scripts/4node_rj45/run.sh << 'EOF'
+#!/bin/bash
+
+export NCCL_HOME=/home/mprg/nccl-build
+export MPI_HOME=/usr/lib/aarch64-linux-gnu/openmpi
+export LD_LIBRARY_PATH=$NCCL_HOME/lib:$MPI_HOME/lib:$LD_LIBRARY_PATH
+export NCCL_SOCKET_IFNAME=enP7s7
+export UCX_NET_DEVICES=enP7s7
+export OMPI_MCA_btl_tcp_if_include=enP7s7
+export NCCL_IB_DISABLE=1
+export NCCL_NET=Socket
+
+mpirun -np 4 \
+  -H 10.0.0.15:1,10.0.0.16:1,10.0.0.17:1,10.0.0.18:1 \
+  --mca plm_rsh_agent "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" \
+  -x LD_LIBRARY_PATH \
+  -x NCCL_SOCKET_IFNAME \
+  -x UCX_NET_DEVICES \
+  -x NCCL_IB_DISABLE \
+  -x NCCL_NET \
+  /home/mprg/nccl-tests/build/all_reduce_perf -b 8 -e 256M -f 2 -g 1
+EOF
+
+chmod +x ~/nccl-test-scripts/4node_rj45/run.sh
+
+### 4台-QSFP
+```
+
+```
+```
 
