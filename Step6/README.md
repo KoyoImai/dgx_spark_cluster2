@@ -82,6 +82,7 @@ ssh-copy-id mprg@10.0.0.17
 ssh-copy-id mprg@10.0.0.18
 ```
 
+
 ## ステップ6.5：NCCLの多node通信テスト
 ### 2台-RJ45接続
 node15で以下のコマンドを実行し，node15とnode16でNCCLテストを行います．
