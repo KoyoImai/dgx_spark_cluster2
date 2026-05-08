@@ -60,6 +60,15 @@ make install PREFIX=/home/mprg/nccl-build
 ```
 sudo apt-get install -y libopenmpi-dev
 ```
+その後，nccl-testのビルドをします．
+以下のコマンドを全ての計算nodeで実行してください．
+```
+cd ~ && git clone https://github.com/NVIDIA/nccl-tests.git
+cd nccl-tests
+make MPI=1 \
+  NCCL_HOME=/home/mprg/nccl-build \
+  MPI_HOME=/usr/lib/aarch64-linux-gnu/openmpi
+```
 
 
 ## ステップ6.3：NCCLの多node通信テスト
