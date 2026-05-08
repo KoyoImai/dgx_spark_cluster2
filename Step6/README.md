@@ -17,11 +17,31 @@ sudo usermod -aG docker mprg
 同様の手順で全ての計算nodeと管理者nodeでDockerグループに追加してください．
 
 
-## ステップ6.2：Dockerイメージのpull
-まず，Dockerイメージのpullから行います．
+## ステップ6.2：Dockerの用意
+まず，Dockerの用意から行います．
 以下のコマンドを全ての計算nodeで実行してください．
 ```
-docker pull nvcr.io/nvidia/pytorch:25.03-py3
+cat > /home4cluster/docker/Dockerfile << 'EOF'
+FROM nvcr.io/nvidia/pytorch:25.03-py3
+
+# NCCLをBlackwell(sm_100)対応でソースビルド
+RUN git clone https://github.com/NVIDIA/nccl.git /tmp/nccl && \
+    cd /tmp/nccl && \
+    make -j$(nproc) \
+      NVCC_GENCODE="-gencode=arch=compute_100,code=sm_100" \
+      PREFIX=/usr/local && \
+    make install PREFIX=/usr/local && \
+    rm -rf /tmp/nccl
+
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+EOF
+```
+```
+for node in node15 node16 node17 node18; do
+    ssh mprg@$node "docker build -t pytorch-nccl-sm100:latest /home4cluster/docker/" &
+done
+wait
+echo "全nodeのビルド完了"
 ```
 
 ## ステップ6.3：NCCLの多node通信テスト
