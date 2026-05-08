@@ -53,16 +53,16 @@ if __name__ == "__main__":
     main()
 ```
 続いて，起動スクリプトも作成します．
-以下の内容のファイルを`/home4cluster/nccl_test/run_nccl_test.sh`に作成してください．
+以下の内容のファイルを`/home4cluster/nccl_test/2node_rj45/run.sh`に作成してください．
 ```
 #!/bin/bash
 
 MASTER_ADDR="10.0.0.15"
 MASTER_PORT="29500"
-NNODES=4
+NNODES=2
 NPROC_PER_NODE=1
 
-NODES=("node15" "node16" "node17" "node18")
+NODES=("node15" "node16")
 
 for i in "${!NODES[@]}"; do
     NODE=${NODES[$i]}
@@ -71,8 +71,9 @@ for i in "${!NODES[@]}"; do
         --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
         -v /home4cluster:/home4cluster \
         -e NCCL_SOCKET_IFNAME=enP7s7 \
-        -e NCCL_IB_DISABLE=0 \
-        -e NCCL_DEBUG=INFO \
+        -e NCCL_IB_DISABLE=1 \
+        -e NCCL_NET=Socket \
+        -e NCCL_DEBUG=WARN \
         nvcr.io/nvidia/pytorch:25.03-py3 \
         torchrun \
         --nnodes=$NNODES \
