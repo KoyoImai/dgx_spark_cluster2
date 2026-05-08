@@ -44,6 +44,24 @@ wait
 echo "全nodeのビルド完了"
 ```
 
+## ステップ6.4：NCCLの準備
+全ての計算nodeでNCCLをビルドします．
+以下のコマンドを全ての計算nodeで実行してください．
+```
+cd ~ && git clone https://github.com/NVIDIA/nccl.git
+cd nccl
+make -j$(nproc) \
+  NVCC_GENCODE="-gencode=arch=compute_121,code=sm_121" \
+  PREFIX=/home/mprg/nccl-build
+make install PREFIX=/home/mprg/nccl-build
+```
+実行が完了したら，OpenMPIをインストールします．
+以下のコマンドを全ての計算nodeで実行してください．
+```
+sudo apt-get install -y libopenmpi-dev
+```
+
+
 ## ステップ6.3：NCCLの多node通信テスト
 NCCLによって多node通信テストを行います．
 管理者nodeで以下の内容のファイルを`/home4cluster/nccl_test/nccl_test.py`に作成してください．
