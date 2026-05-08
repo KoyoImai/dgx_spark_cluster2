@@ -44,7 +44,7 @@ wait
 echo "全nodeのビルド完了"
 ```
 
-## ステップ6.4：NCCLの準備
+## ステップ6.3：NCCLの準備
 全ての計算nodeでNCCLをビルドします．
 以下のコマンドを全ての計算nodeで実行してください．
 ```
@@ -70,69 +70,50 @@ make MPI=1 \
   MPI_HOME=/usr/lib/aarch64-linux-gnu/openmpi
 ```
 
-
-## ステップ6.3：NCCLの多node通信テスト
-NCCLによって多node通信テストを行います．
-管理者nodeで以下の内容のファイルを`/home4cluster/nccl_test/nccl_test.py`に作成してください．
+## ステップ6.4：計算node間でのssh鍵の共有
+計算node間でssh鍵を共有します．
+node15で以下を実行してください．
 ```
-import torch
-import torch.distributed as dist
-import os
+ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519
 
-def main():
-    dist.init_process_group(backend="nccl")
-    rank = dist.get_rank()
-    world_size = dist.get_world_size()
-    local_rank = int(os.environ.get("LOCAL_RANK", 0))
-
-    torch.cuda.set_device(local_rank)
-    device = torch.device("cuda", local_rank)
-
-    tensor = torch.ones(1).to(device) * rank
-    print(f"[rank {rank}/{world_size}] before all_reduce: {tensor.item()}")
-
-    dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
-    print(f"[rank {rank}/{world_size}] after all_reduce: {tensor.item()}")
-
-    dist.destroy_process_group()
-
-if __name__ == "__main__":
-    main()
-```
-続いて，起動スクリプトも作成します．
-以下の内容のファイルを`/home4cluster/nccl_test/2node_rj45/run.sh`に作成してください．
-```
-#!/bin/bash
-
-MASTER_ADDR="10.0.0.15"
-MASTER_PORT="29500"
-NNODES=2
-NPROC_PER_NODE=1
-
-NODES=("node15" "node16")
-
-for i in "${!NODES[@]}"; do
-    NODE=${NODES[$i]}
-    RANK=$i
-    ssh mprg@$NODE "docker run --rm --gpus all --network host \
-        --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
-        -v /home4cluster:/home4cluster \
-        -e NCCL_SOCKET_IFNAME=enP7s7 \
-        -e NCCL_IB_DISABLE=1 \
-        -e NCCL_NET=Socket \
-        -e NCCL_DEBUG=WARN \
-        pytorch-nccl-sm100:latest \
-        torchrun \
-        --nnodes=$NNODES \
-        --nproc_per_node=$NPROC_PER_NODE \
-        --master_addr=$MASTER_ADDR \
-        --master_port=$MASTER_PORT \
-        --node_rank=$RANK \
-        /home4cluster/nccl_test/nccl_test.py" &
-done
-wait
+ssh-copy-id mprg@10.0.0.15
+ssh-copy-id mprg@10.0.0.16
+ssh-copy-id mprg@10.0.0.17
+ssh-copy-id mprg@10.0.0.18
 ```
 
+## ステップ6.5：NCCLの多node通信テスト
+### 2台-RJ45接続
+node15で以下のコマンドを実行し，node15とnode16でNCCLテストを行います．
+```
+export NCCL_IB_DISABLE=1
+export NCCL_NET=Socket
 
+mpirun -np 2 \
+  -H 10.0.0.15:1,10.0.0.16:1 \
+  --mca plm_rsh_agent "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" \
+  -x LD_LIBRARY_PATH \
+  -x NCCL_SOCKET_IFNAME \
+  -x UCX_NET_DEVICES \
+  -x NCCL_IB_DISABLE \
+  -x NCCL_NET \
+  /home/mprg/nccl-tests/build/all_reduce_perf -b 8 -e 256M -f 2 -g 1
+```
+
+### 2台-QSFP
+```
+export NCCL_IB_HCA=rocep1s0f0
+
+mpirun -np 2 \
+  -H 10.0.1.1:1,10.0.1.2:1 \
+  --mca plm_rsh_agent "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" \
+  -x LD_LIBRARY_PATH \
+  -x NCCL_SOCKET_IFNAME \
+  -x UCX_NET_DEVICES \
+  -x NCCL_IB_DISABLE \
+  -x NCCL_NET \
+  -x NCCL_IB_HCA \
+  /home/mprg/nccl-tests/build/all_reduce_perf -b 8 -e 256M -f 2 -g 1
+```
 
 
