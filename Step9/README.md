@@ -316,5 +316,24 @@ echo "全スクリプト作成完了"
 bash /home4cluster/lora_train/run_bs1_2node_rj45.sh
 ```
 
+バッチサイズ2
+```
+# /home4cluster/lora_train/logs/2node_rj45_bs2_20260509_104850_steps.csv
+bash /home4cluster/lora_train/run_bs1_2node_rj45.sh
+```
 
+
+
+バッチサイズ4
+```
+# /home4cluster/lora_train/logs/2node_rj45_bs4_20260509_105734_steps.csv
+bash /home4cluster/lora_train/run_bs4_2node_rj45.sh
+```
+
+
+バッチサイズ8
+```
+#
+
+```
 
