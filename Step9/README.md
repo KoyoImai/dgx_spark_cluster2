@@ -37,8 +37,8 @@
 | batch_size | throughput | avg_step_time | elapsed | peak_vram | 対1node-bs1比 |
 |-----------|-----------|---------------|---------|-----------|--------------|
 | 1 | 8.27 samples/sec | 0.466s | 118.5s |  |  |
-| 2 | 4.78 samples/sec | 0.821s | 205.2s |  |  |
-| 4 | 5.12 samples/sec | 1.546s | 187.6s |  |  |
+| 2 | 9.27 samples/sec | 0.846s | 103.5s |  |  |
+| 4 | 10.32 samples/sec | 1.533s | 89.9s |  |  |
 | 8 | 5.27 samples/sec | 3.017s | 175.9s |  |  |
 | 16 | 5.57 samples/sec | 5.724s | 155.0s |  |  |
 
@@ -499,13 +499,13 @@ bash /home4cluster/lora_train/run_bs1_4node_rj45.sh
 
 バッチサイズ2
 ```
-
+/home4cluster/lora_train/logs/4node_rj45_bs2_20260509_121052_steps.csv
 bash /home4cluster/lora_train/run_bs2_4node_rj45.sh
 ```
 
 バッチサイズ4
 ```
-
+# /home4cluster/lora_train/logs/4node_rj45_bs4_20260509_121551_steps.csv
 bash /home4cluster/lora_train/run_bs4_4node_rj45.sh
 ```
 
