@@ -23,7 +23,7 @@
 | 1node | 0.43 samples/sec | 2.303s | 2,308s（38分） | 1.00x |
 | 2node-RJ45 | 0.13 samples/sec | 14.818s | 7,344s（122分） | 0.30x |
 | 2node-QSFP | 0.20 samples/sec | 9.952s | 4,935s（82分） | 0.47x |
-
+| 4node-RJ45 | 0.19 samples/sec | 21.331s | 5,231s（87分） | 0.30x |
 
 ### 考察
 
