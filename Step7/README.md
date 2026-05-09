@@ -459,6 +459,7 @@ ssh mprg@node15 "docker run --rm --gpus all --network host \
     -e NCCL_SOCKET_IFNAME=enP7s7 \
     -e NCCL_IB_DISABLE=1 \
     -e NCCL_NET=Socket \
+    -e CONNECT_TYPE=none \
     nvcr.io/nvidia/pytorch:25.05-py3 \
     bash -c 'pip install -q peft transformers datasets && torchrun \
         --nnodes=1 --nproc_per_node=1 \
@@ -466,6 +467,7 @@ ssh mprg@node15 "docker run --rm --gpus all --network host \
         /home4cluster/lora_train/train_alpaca.py'"
 EOF
 chmod +x /home4cluster/lora_train/run_alpaca_1node.sh
+bash /home4cluster/lora_train/run_alpaca_1node.sh
 ```
 
 
