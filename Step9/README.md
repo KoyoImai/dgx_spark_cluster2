@@ -25,11 +25,11 @@
 
 | batch_size | throughput | avg_step_time | elapsed | peak_vram | 対1node-bs1比 |
 |-----------|-----------|---------------|---------|-----------|--------------|
-| 1 | 4.19 samples/sec | 0.460s | 236s |  | 1.98x |
-| 2 | 4.67 samples/sec | 0.840s | 210s |  | 2.20x |
-| 4 | 5.14 samples/sec | 1.539s | 187s |  | 2.42x |
-| 8 | 5.33 samples/sec | 2.981s | 174s |  | - |
-| 16 | 5.61 samples/sec | 5.691s | 154.1s |  | - |
+| 1 | 4.16 samples/sec | 0.463s | 237.7s |  |  |
+| 2 | 4.67 samples/sec | 0.840s | 210s |  |  |
+| 4 | 5.14 samples/sec | 1.539s | 187s |  |  |
+| 8 | 5.33 samples/sec | 2.981s | 174s |  |  |
+| 16 | 5.61 samples/sec | 5.691s | 154.1s |  |  |
 
 
 
