@@ -70,7 +70,7 @@ LoRAは各モジュールに `A`（r×in）と `B`（out×r）の2行列を追�
 | 16 | 4.06 samples/sec | 0.475s | 243.9s |  |  |
 | 32 | 4.08 samples/sec | 0.473s | 242.4s |  |  |
 | 64 | 3.91 samples/sec | 0.494s | 253.3s |  |  |
-| 128 | 2.03 samples/sec | 0.473s | 489.2s |  |  |
+| 128 | 3.83 samples/sec | 0.503s | 258.4s |  |  |
 
 
 ## バッチサイズ変更実験結果（LoRA, 2node-QSFP）
@@ -503,8 +503,9 @@ bash /home4cluster/lora_train/run_r64_4node_rj45.sh
 # /home4cluster/lora_train/logs/1node_none_r128_20260509_151645_steps.csv
 bash /home4cluster/lora_train/run_r128_1node.sh
 
-
+# /home4cluster/lora_train/logs/2node_rj45_r128_20260509_234114_steps.csv
 bash /home4cluster/lora_train/run_r128_2node_rj45.sh
+
 bash /home4cluster/lora_train/run_r128_2node_qsfp.sh
 bash /home4cluster/lora_train/run_r128_4node_rj45.sh
 ```
