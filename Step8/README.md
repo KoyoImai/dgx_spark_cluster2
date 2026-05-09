@@ -1,6 +1,6 @@
 # ステップ8：LLMの学習（Qwen2.5-7B-Instruct+フルファインチューニング+tatsu-lab/alpaca）]
 
-## 学習スクリプトの作成
+## ステップ8.1：学習スクリプトの作成
 フルファインチューニング用の学習スクリプトを作成します．
 管理者nodeで以下のコマンドを実行してください．
 ```
@@ -197,6 +197,30 @@ def main():
 if __name__ == "__main__":
     main()
 EOF
+```
+
+## ステップ8.2：学習
+### 1node
+```
+cat > /home4cluster/lora_train/run_full_1node.sh << 'EOF'
+#!/bin/bash
+ssh mprg@node15 "docker run --rm --gpus all --network host \
+    --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+    -v /home4cluster:/home4cluster \
+    -v /home/mprg/nccl-build:/home/mprg/nccl-build \
+    -e LD_PRELOAD=/home/mprg/nccl-build/lib/libnccl.so \
+    -e NCCL_SOCKET_IFNAME=enP7s7 \
+    -e NCCL_IB_DISABLE=1 \
+    -e NCCL_NET=Socket \
+    -e CONNECT_TYPE=none \
+    nvcr.io/nvidia/pytorch:25.05-py3 \
+    bash -c 'pip install -q peft transformers datasets && torchrun \
+        --nnodes=1 --nproc_per_node=1 \
+        --master_addr=localhost --master_port=29500 \
+        /home4cluster/lora_train/train_alpaca_full.py'"
+EOF
+chmod +x /home4cluster/lora_train/run_full_1node.sh
+bash /home4cluster/lora_train/run_full_1node.sh
 ```
 
 
