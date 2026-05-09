@@ -1,4 +1,46 @@
 # ステップ10：LoRAランク変更実験
+
+## LoRAランク変更実験結果（LoRA, 1node）
+
+| LoRAランク | throughput | avg_step_time | elapsed | peak_vram | 対bs=1比 |
+|-----------|-----------|---------------|---------|-----------|---------|
+| 16 | 2.12 samples/sec | 0.454s | 469.8s |  |  |
+| 32 | 2.33 samples/sec | 0.840s | 425s |  |  |
+| 64 | 2.60 samples/sec | 1.520s | 377s |  |  |
+
+
+## バッチサイズ変更実験結果（LoRA, 2node-RJ45）
+
+| batch_size | throughput | avg_step_time | elapsed | peak_vram | 対1node-bs1比 |
+|-----------|-----------|---------------|---------|-----------|--------------|
+| 1 | 4.19 samples/sec | 0.460s | 236s |  | 1.98x |
+| 2 | 4.67 samples/sec | 0.840s | 210s |  | 2.20x |
+| 4 | 5.14 samples/sec | 1.539s | 187s |  | 2.42x |
+| 8 | 5.33 samples/sec | 2.981s | 174s |  | - |
+| 16 | 5.61 samples/sec | 5.691s | 154.1s |  | - |
+
+
+## バッチサイズ変更実験結果（LoRA, 2node-QSFP）
+
+| batch_size | throughput | avg_step_time | elapsed | peak_vram | 対1node-bs1比 |
+|-----------|-----------|---------------|---------|-----------|--------------|
+| 1 | 4.16 samples/sec | 0.463s | 237.7s |  |  |
+| 2 | 4.78 samples/sec | 0.821s | 205.2s |  |  |
+| 4 | 5.12 samples/sec | 1.546s | 187.6s |  |  |
+| 8 | 5.27 samples/sec | 3.017s | 175.9s |  |  |
+| 16 | 5.57 samples/sec | 5.724s | 155.0s |  |  |
+
+
+## バッチサイズ変更実験結果（LoRA, 4node-RJ45）
+
+| batch_size | throughput | avg_step_time | elapsed | peak_vram | 対1node-bs1比 |
+|-----------|-----------|---------------|---------|-----------|--------------|
+| 1 | 8.27 samples/sec | 0.466s | 118.5s |  |  |
+| 2 | 9.27 samples/sec | 0.846s | 103.5s |  |  |
+| 4 | 10.32 samples/sec | 1.533s | 89.9s |  |  |
+| 8 | 10.74 samples/sec | 2.961s | 80.4s |  |  |
+| 16 | 11.23 samples/sec | 5.679s | 62.7s |  |  |
+
  
 ## 実験設定
  
