@@ -174,6 +174,9 @@ wait
 EOF
 chmod +x /home4cluster/lora_train/run_2node_rj45.sh
 ```
+```
+bash /home4cluster/lora_train/run_2node_rj45.sh
+```
 
 ### 2node-LoRAチューニング(QSFP)
 ```
