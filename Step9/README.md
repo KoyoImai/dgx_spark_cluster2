@@ -246,6 +246,7 @@ echo "全スクリプト作成完了"
 
 ### 学習の実行
 ```
+# log: /home4cluster/lora_train/logs/1node_none_bs1_20260509_093756_steps.csv
 bash /home4cluster/lora_train/run_bs1_1node.sh
 ```
 
