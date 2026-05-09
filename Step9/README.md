@@ -18,7 +18,7 @@
 | 2 | 4.67 samples/sec | 0.840s | 210s | 14.63GB | 2.20x |
 | 4 | 5.14 samples/sec | 1.539s | 187s | 14.99GB | 2.42x |
 | 8 | 5.33 samples/sec | 2.981s | 174s | 15.66GB | - |
-| 16 | - | - | - | - | - |
+| 16 | 5.61 samples/sec | 5.691s | 154.1s | 17.04 | - |
 
 
 ## ステップ9.1：学習スクリプトの作成
@@ -336,12 +336,12 @@ echo "全スクリプト作成完了"
 bash /home4cluster/lora_train/run_bs1_2node_rj45.sh
 ```
 
+
 バッチサイズ2
 ```
 # /home4cluster/lora_train/logs/2node_rj45_bs2_20260509_104850_steps.csv
 bash /home4cluster/lora_train/run_bs1_2node_rj45.sh
 ```
-
 
 
 バッチサイズ4
@@ -353,7 +353,14 @@ bash /home4cluster/lora_train/run_bs4_2node_rj45.sh
 
 バッチサイズ8
 ```
-#
+# /home4cluster/lora_train/logs/2node_rj45_bs8_20260509_110256_steps.csv
+bash /home4cluster/lora_train/run_bs8_2node_rj45.sh
+```
 
+
+バッチサイズ16
+```
+# /home4cluster/lora_train/logs/2node_rj45_bs16_20260509_110935_steps.csv
+bash /home4cluster/lora_train/run_bs16_2node_rj45.sh
 ```
 
