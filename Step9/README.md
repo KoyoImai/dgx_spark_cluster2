@@ -28,7 +28,7 @@
 | 1 | 4.16 samples/sec | 0.463s | 237.7s |  |  |
 | 2 | 4.78 samples/sec | 0.821s | 205.2s |  |  |
 | 4 | 5.12 samples/sec | 1.546s | 187.6s |  |  |
-| 8 | 5.33 samples/sec | 2.981s | 174s |  |  |
+| 8 | 5.27 samples/sec | 3.017s | 175.9s |  |  |
 | 16 | 5.61 samples/sec | 5.691s | 154.1s |  |  |
 
 
@@ -432,6 +432,6 @@ bash /home4cluster/lora_train/run_bs4_2node_qsfp.sh
 
 バッチサイズ8
 ```
-#
-
+# /home4cluster/lora_train/logs/2node_qsfp_bs8_20260509_114708_steps.csv
+bash /home4cluster/lora_train/run_bs8_2node_qsfp.sh
 ```
