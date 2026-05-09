@@ -1,5 +1,25 @@
 # ステップ9：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）-バッチサイズ変更-
 
+## バッチサイズ変更実験結果（LoRA, 1node）
+
+| batch_size | throughput | avg_step_time | elapsed | peak_vram | 対bs=1比 |
+|-----------|-----------|---------------|---------|-----------|---------|
+| 1 | 2.12 samples/sec | 0.453s | 469s | 14.45GB | 1.00x |
+| 2 | 2.33 samples/sec | 0.840s | 425s | 14.63GB | 1.10x |
+| 4 | 2.60 samples/sec | 1.520s | 377s | 14.99GB | 1.23x |
+| 8 | 2.66 samples/sec | 2.995s | 362s | 15.66GB | 1.26x |
+| 16 | 2.79 samples/sec | 5.720s | 333s | 17.04GB | 1.32x |
+
+## バッチサイズ変更実験結果（LoRA, 2node-RJ45）
+
+| batch_size | throughput | avg_step_time | elapsed | peak_vram | 対1node-bs1比 |
+|-----------|-----------|---------------|---------|-----------|--------------|
+| 1 | 4.19 samples/sec | 0.460s | 236s | 14.45GB | 1.98x |
+| 2 | 4.67 samples/sec | 0.840s | 210s | 14.63GB | 2.20x |
+| 4 | 5.14 samples/sec | 1.539s | 187s | 14.99GB | 2.42x |
+| 8 | - | - | - | - | - |
+| 16 | - | - | - | - | - |
+
 
 ## ステップ9.1：学習スクリプトの作成
 管理者nodeで以下のコマンドを実行し，学習スクリプトを作成してください．
