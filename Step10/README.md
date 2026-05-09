@@ -279,7 +279,7 @@ EOF
 管理者nodeで以下を実行してください。12本のスクリプトがまとめて生成されます。
  
 ```bash
-for R in 16 32 64; do
+for R in 16 32 64 128; do
  
 # --- 1node ---
 cat > /home4cluster/lora_train/run_r${R}_1node.sh << EOF
@@ -429,8 +429,10 @@ bash /home4cluster/lora_train/run_r32_4node_rj45.sh
  
 ```bash
 # node1
-# 
+# /home4cluster/lora_train/logs/1node_none_r64_20260509_150103_steps.csv
 bash /home4cluster/lora_train/run_r64_1node.sh
+
+
 bash /home4cluster/lora_train/run_r64_2node_rj45.sh
 bash /home4cluster/lora_train/run_r64_2node_qsfp.sh
 bash /home4cluster/lora_train/run_r64_4node_rj45.sh
