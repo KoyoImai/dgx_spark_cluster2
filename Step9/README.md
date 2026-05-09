@@ -220,7 +220,7 @@ EOF
 ## ステップ9.2：1nodeでの学習
 ### 起動スクリプトの作成
 ```
-for BS in 1 2 4 8 16; do
+for BS in 1 2 4 8 16 32; do
 cat > /home4cluster/lora_train/run_bs${BS}_1node.sh << EOF
 #!/bin/bash
 ssh mprg@node15 "docker run --rm --gpus all --network host \\
@@ -274,4 +274,13 @@ bash /home4cluster/lora_train/run_bs8_1node.sh
 # /home4cluster/lora_train/logs/1node_none_bs16_20260509_101627_steps.csv
 bash /home4cluster/lora_train/run_bs16_1node.sh
 ```
+
+
+
+## ステップ9.3：2node（RJ45）での学習
+
+
+
+
+
 
