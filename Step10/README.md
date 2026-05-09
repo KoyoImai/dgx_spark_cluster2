@@ -5,7 +5,7 @@
 | LoRAランク | throughput | avg_step_time | elapsed | peak_vram | 対bs=1比 |
 |-----------|-----------|---------------|---------|-----------|---------|
 | 16 | 2.12 samples/sec | 0.454s | 469.8s |  |  |
-| 32 | 2.33 samples/sec | 0.840s | 425s |  |  |
+| 32 | 2.09 samples/sec | 0.460s | 475.7s |  |  |
 | 64 | 2.60 samples/sec | 1.520s | 377s |  |  |
 
 
