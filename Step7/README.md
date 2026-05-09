@@ -1,4 +1,4 @@
-# ステップ7：LLMの学習（???+LoRA）
+# ステップ7：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）
 
 ## LoRAチューニング学習速度比較結果
 ### 実験設定
