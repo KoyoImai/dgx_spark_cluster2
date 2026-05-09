@@ -292,6 +292,7 @@ LORA_ALPHA = 16
 SEED = 42
 LOG_DIR = "/home4cluster/lora_train/logs"
 CONNECT_TYPE = os.environ.get("CONNECT_TYPE", "unknown")
+LOG_INTERVAL = 10
 
 def set_seed(seed):
     random.seed(seed)
@@ -334,16 +335,21 @@ def main():
     torch.cuda.set_device(0)
     device = torch.device("cuda", 0)
 
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    log_name = f"{world_size}node_{CONNECT_TYPE}_{timestamp}"
+
     if rank == 0:
         os.makedirs(LOG_DIR, exist_ok=True)
         print(f"=== 実験設定 ===")
-        print(f"world_size: {world_size}")
-        print(f"connect_type: {CONNECT_TYPE}")
-        print(f"num_samples: {NUM_SAMPLES}")
-        print(f"seq_len: {SEQ_LEN}")
-        print(f"batch_size: {BATCH_SIZE}")
-        print(f"lora_r: {LORA_R}")
-        print(f"seed: {SEED}")
+        print(f"world_size   : {world_size}")
+        print(f"connect_type : {CONNECT_TYPE}")
+        print(f"num_samples  : {NUM_SAMPLES}")
+        print(f"seq_len      : {SEQ_LEN}")
+        print(f"batch_size   : {BATCH_SIZE}")
+        print(f"lora_r       : {LORA_R}")
+        print(f"seed         : {SEED}")
+        print(f"log_name     : {log_name}")
+        print()
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
     tokenizer.pad_token = tokenizer.eos_token
@@ -363,21 +369,29 @@ def main():
     model = get_peft_model(model, lora_config)
     if rank == 0:
         model.print_trainable_parameters()
+        print()
 
     model = DDP(model, device_ids=[0])
 
     dataset = AlpacaDataset(tokenizer)
     sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, seed=SEED)
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, sampler=sampler)
+    total_steps = len(dataloader)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+
+    # ステップログ用CSVの準備
+    step_csv_path = f"{LOG_DIR}/{log_name}_steps.csv"
+    if rank == 0:
+        with open(step_csv_path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["step", "loss", "step_time"])
 
     model.train()
     total_loss = 0.0
     steps = 0
     start = None
     step_times = []
-    step_start = None
 
     for batch in dataloader:
         input_ids = batch["input_ids"].to(device)
@@ -390,7 +404,7 @@ def main():
         optimizer.step()
         optimizer.zero_grad()
         torch.cuda.synchronize()
-        step_end = time.time()
+        step_time = time.time() - step_start
 
         steps += 1
 
@@ -399,8 +413,23 @@ def main():
             start = time.time()
 
         if steps > WARMUP_STEPS:
-            total_loss += loss.detach().item()
-            step_times.append(step_end - step_start)
+            loss_val = loss.detach().item()
+            total_loss += loss_val
+            step_times.append(step_time)
+
+            if rank == 0:
+                # ステップログをCSVに保存
+                with open(step_csv_path, "a", newline="") as f:
+                    writer = csv.writer(f)
+                    writer.writerow([steps, f"{loss_val:.4f}", f"{step_time:.3f}"])
+
+                # LOG_INTERVALごとにprint
+                if (steps - WARMUP_STEPS) % LOG_INTERVAL == 0:
+                    measured = steps - WARMUP_STEPS
+                    print(f"step {steps:4d}/{total_steps} | "
+                          f"loss: {loss_val:.4f} | "
+                          f"step_time: {step_time:.3f}s | "
+                          f"throughput: {world_size / step_time:.2f} samples/sec")
 
     torch.cuda.synchronize()
     elapsed = time.time() - start
@@ -411,16 +440,16 @@ def main():
 
     if rank == 0:
         print(f"\n=== 結果 ===")
-        print(f"steps: {steps} (warmup: {WARMUP_STEPS}, measured: {measured_steps})")
-        print(f"avg_loss: {avg_loss:.4f}")
-        print(f"elapsed: {elapsed:.1f}s")
-        print(f"throughput: {throughput:.2f} samples/sec")
+        print(f"steps        : {steps} (warmup: {WARMUP_STEPS}, measured: {measured_steps})")
+        print(f"avg_loss     : {avg_loss:.4f}")
+        print(f"elapsed      : {elapsed:.1f}s")
+        print(f"throughput   : {throughput:.2f} samples/sec")
         print(f"avg_step_time: {avg_step_time:.3f}s/step")
 
-        # CSVに保存
-        csv_path = f"{LOG_DIR}/results.csv"
-        file_exists = os.path.exists(csv_path)
-        with open(csv_path, "a", newline="") as f:
+        # サマリーCSVに保存
+        summary_csv_path = f"{LOG_DIR}/results.csv"
+        file_exists = os.path.exists(summary_csv_path)
+        with open(summary_csv_path, "a", newline="") as f:
             writer = csv.writer(f)
             if not file_exists:
                 writer.writerow([
@@ -436,7 +465,8 @@ def main():
                 measured_steps, f"{avg_loss:.4f}", f"{elapsed:.1f}",
                 f"{throughput:.2f}", f"{avg_step_time:.3f}"
             ])
-        print(f"ログ保存: {csv_path}")
+        print(f"\nステップログ : {step_csv_path}")
+        print(f"サマリーログ : {summary_csv_path}")
 
     dist.destroy_process_group()
 
