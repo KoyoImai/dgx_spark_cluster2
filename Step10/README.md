@@ -395,6 +395,7 @@ echo "全12スクリプト生成完了"
  
 ```bash
 # 1node
+# /home4cluster/lora_train/logs/1node_none_r16_20260509_143323_steps.csv
 bash /home4cluster/lora_train/run_r16_1node.sh
  
 # 2node-RJ45
@@ -410,9 +411,16 @@ bash /home4cluster/lora_train/run_r16_4node_rj45.sh
 ### r=32
  
 ```bash
+# 1node
 bash /home4cluster/lora_train/run_r32_1node.sh
+
+# 2node-RJ45
 bash /home4cluster/lora_train/run_r32_2node_rj45.sh
+
+# 2node-QSFP
 bash /home4cluster/lora_train/run_r32_2node_qsfp.sh
+
+# 4node-RJ45
 bash /home4cluster/lora_train/run_r32_4node_rj45.sh
 ```
  
