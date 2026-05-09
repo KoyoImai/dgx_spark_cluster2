@@ -255,6 +255,37 @@ bash /home4cluster/lora_train/run_full_2node_rj45.sh
 ```
 
 
+### 2node-qsfp
+node17とnode18で実行します．
+```
+cat > /home4cluster/lora_train/run_full_2node_qsfp.sh << 'EOF'
+#!/bin/bash
+MASTER_ADDR="10.0.2.1"; MASTER_PORT="29500"; NNODES=2
+NODES=("node17" "node18")
+for i in "${!NODES[@]}"; do
+    NODE=${NODES[$i]}; RANK=$i
+    ssh mprg@$NODE "docker run --rm --gpus all --network host \
+        --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+        -v /home4cluster:/home4cluster \
+        -v /home/mprg/nccl-build:/home/mprg/nccl-build \
+        -e LD_PRELOAD=/home/mprg/nccl-build/lib/libnccl.so \
+        -e NCCL_SOCKET_IFNAME=enp1s0f0np0 \
+        -e NCCL_IB_DISABLE=0 \
+        -e NCCL_IB_HCA=rocep1s0f0 \
+        -e CONNECT_TYPE=qsfp \
+        nvcr.io/nvidia/pytorch:25.05-py3 \
+        bash -c 'pip install -q peft transformers datasets && torchrun \
+            --nnodes=$NNODES --nproc_per_node=1 \
+            --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT \
+            --node_rank=$RANK \
+            /home4cluster/lora_train/train_alpaca_full.py'" &
+done; wait
+EOF
+chmod +x /home4cluster/lora_train/run_full_2node_qsfp.sh
+bash /home4cluster/lora_train/run_full_2node_qsfp.sh
+```
+
+
 
 
 
