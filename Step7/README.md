@@ -251,7 +251,7 @@ chmod +x /home4cluster/lora_train/run_4node_rj45.sh
 bash /home4cluster/lora_train/run_4node_rj45.sh
 ```
 
-## tatsu-lab/alpacaデータセットのダウンロード
+## tatsu-lab/alpacaデータセットのダウンロード & 学習スクリプト作成
 管理者nodeで以下のコマンドを実行してください．
 ```
 docker run --rm \
@@ -265,6 +265,132 @@ print(f'Download complete: {len(dataset)} samples')
 \""
 ```
 
+```
+cat > /home4cluster/lora_train/train_alpaca.py << 'EOF'
+import os
+import time
+import torch
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import get_peft_model, LoraConfig, TaskType
+from torch.utils.data import Dataset, DataLoader, DistributedSampler
+from datasets import load_from_disk
+
+MODEL_PATH = "/home4cluster/models/Qwen2.5-7B-Instruct"
+DATASET_PATH = "/home4cluster/datasets/alpaca"
+NUM_SAMPLES = 1000
+SEQ_LEN = 512
+WARMUP_STEPS = 5
+
+class AlpacaDataset(Dataset):
+    def __init__(self, tokenizer, num_samples=NUM_SAMPLES, seq_len=SEQ_LEN):
+        dataset = load_from_disk(DATASET_PATH)
+        self.tokenizer = tokenizer
+        self.seq_len = seq_len
+        self.samples = []
+
+        for item in dataset.select(range(num_samples)):
+            prompt = f"### Instruction:\n{item['instruction']}\n"
+            if item['input']:
+                prompt += f"### Input:\n{item['input']}\n"
+            prompt += f"### Response:\n{item['output']}"
+
+            encoded = tokenizer(
+                prompt,
+                max_length=seq_len,
+                truncation=True,
+                padding="max_length",
+                return_tensors="pt"
+            )
+            self.samples.append({
+                "input_ids": encoded["input_ids"].squeeze(),
+                "labels": encoded["input_ids"].squeeze()
+            })
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        return self.samples[idx]
+
+def main():
+    dist.init_process_group(backend="nccl")
+    rank = dist.get_rank()
+    world_size = dist.get_world_size()
+    torch.cuda.set_device(0)
+    device = torch.device("cuda", 0)
+
+    if rank == 0:
+        print(f"world_size: {world_size}")
+        print(f"Loading model from {MODEL_PATH}")
+
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+    tokenizer.pad_token = tokenizer.eos_token
+
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_PATH,
+        dtype=torch.bfloat16,
+    ).to(device)
+
+    lora_config = LoraConfig(
+        task_type=TaskType.CAUSAL_LM,
+        r=8,
+        lora_alpha=16,
+        target_modules=["q_proj", "v_proj"],
+        lora_dropout=0.05,
+    )
+    model = get_peft_model(model, lora_config)
+    if rank == 0:
+        model.print_trainable_parameters()
+
+    model = DDP(model, device_ids=[0])
+
+    dataset = AlpacaDataset(tokenizer)
+    sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank)
+    dataloader = DataLoader(dataset, batch_size=1, sampler=sampler)
+
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+
+    model.train()
+    total_loss = 0
+    steps = 0
+    start = None
+
+    for batch in dataloader:
+        input_ids = batch["input_ids"].to(device)
+        labels = batch["labels"].to(device)
+        outputs = model(input_ids=input_ids, labels=labels)
+        loss = outputs.loss
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+        steps += 1
+
+        # ウォームアップ後に計測開始
+        if steps == WARMUP_STEPS:
+            torch.cuda.synchronize()
+            start = time.time()
+
+        if steps > WARMUP_STEPS:
+            total_loss += loss.detach().item()
+
+    torch.cuda.synchronize()
+    elapsed = time.time() - start
+    measured_steps = steps - WARMUP_STEPS
+
+    if rank == 0:
+        print(f"steps: {steps} (warmup: {WARMUP_STEPS}, measured: {measured_steps})")
+        print(f"avg_loss: {total_loss/measured_steps:.4f}")
+        print(f"elapsed: {elapsed:.1f}s")
+        print(f"throughput: {measured_steps * world_size / elapsed:.2f} samples/sec")
+
+    dist.destroy_process_group()
+
+if __name__ == "__main__":
+    main()
+EOF
+```
 
 
 
