@@ -63,15 +63,14 @@ LoRAは各モジュールに `A`（r×in）と `B`（out×r）の2行列を追�
 | 128 | 2.03 samples/sec | 0.473s | 489.2s |  |  |
 
 
-## バッチサイズ変更実験結果（LoRA, 2node-RJ45）
+## LoRAランク変更実験結果（LoRA, 2node-RJ45）
 
-| batch_size | throughput | avg_step_time | elapsed | peak_vram | 対1node-bs1比 |
-|-----------|-----------|---------------|---------|-----------|--------------|
-| 1 | 4.19 samples/sec | 0.460s | 236s |  | 1.98x |
-| 2 | 4.67 samples/sec | 0.840s | 210s |  | 2.20x |
-| 4 | 5.14 samples/sec | 1.539s | 187s |  | 2.42x |
-| 8 | 5.33 samples/sec | 2.981s | 174s |  | - |
-| 16 | 5.61 samples/sec | 5.691s | 154.1s |  | - |
+| LoRAランク | throughput | avg_step_time | elapsed | peak_vram | 対bs=1比 |
+|-----------|-----------|---------------|---------|-----------|---------|
+| 16 | 4.06 samples/sec | 0.475s | 243.9s |  |  |
+| 32 | 2.09 samples/sec | 0.460s | 475.7s |  |  |
+| 64 | 2.11 samples/sec | 0.456s | 472.6s |  |  |
+| 128 | 2.03 samples/sec | 0.473s | 489.2s |  |  |
 
 
 ## バッチサイズ変更実験結果（LoRA, 2node-QSFP）
@@ -453,6 +452,7 @@ echo "全12スクリプト生成完了"
 bash /home4cluster/lora_train/run_r16_1node.sh
  
 # 2node-RJ45
+# /home4cluster/lora_train/logs/2node_rj45_r16_20260509_152723_steps.csv
 bash /home4cluster/lora_train/run_r16_2node_rj45.sh
  
 # 2node-QSFP
