@@ -412,6 +412,7 @@ bash /home4cluster/lora_train/run_r16_4node_rj45.sh
  
 ```bash
 # 1node
+# /home4cluster/lora_train/logs/1node_none_r32_20260509_144933_steps.csv
 bash /home4cluster/lora_train/run_r32_1node.sh
 
 # 2node-RJ45
@@ -427,6 +428,8 @@ bash /home4cluster/lora_train/run_r32_4node_rj45.sh
 ### r=64
  
 ```bash
+# node1
+# 
 bash /home4cluster/lora_train/run_r64_1node.sh
 bash /home4cluster/lora_train/run_r64_2node_rj45.sh
 bash /home4cluster/lora_train/run_r64_2node_qsfp.sh
