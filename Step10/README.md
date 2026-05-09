@@ -68,7 +68,7 @@ LoRAは各モジュールに `A`（r×in）と `B`（out×r）の2行列を追�
 | LoRAランク | throughput | avg_step_time | elapsed | peak_vram | 対bs=1比 |
 |-----------|-----------|---------------|---------|-----------|---------|
 | 16 | 4.06 samples/sec | 0.475s | 243.9s |  |  |
-| 32 | 2.09 samples/sec | 0.460s | 475.7s |  |  |
+| 32 | 4.08 samples/sec | 0.473s | 242.4s |  |  |
 | 64 | 2.11 samples/sec | 0.456s | 472.6s |  |  |
 | 128 | 2.03 samples/sec | 0.473s | 489.2s |  |  |
 
@@ -470,6 +470,7 @@ bash /home4cluster/lora_train/run_r16_4node_rj45.sh
 bash /home4cluster/lora_train/run_r32_1node.sh
 
 # 2node-RJ45
+# /home4cluster/lora_train/logs/2node_rj45_r32_20260509_153421_steps.csv
 bash /home4cluster/lora_train/run_r32_2node_rj45.sh
 
 # 2node-QSFP
@@ -482,11 +483,11 @@ bash /home4cluster/lora_train/run_r32_4node_rj45.sh
 ### r=64
  
 ```bash
-# node1
+# 1node
 # /home4cluster/lora_train/logs/1node_none_r64_20260509_150103_steps.csv
 bash /home4cluster/lora_train/run_r64_1node.sh
 
-
+# 2node(RJ45)
 bash /home4cluster/lora_train/run_r64_2node_rj45.sh
 bash /home4cluster/lora_train/run_r64_2node_qsfp.sh
 bash /home4cluster/lora_train/run_r64_4node_rj45.sh
