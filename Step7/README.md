@@ -269,7 +269,10 @@ print(f'Download complete: {len(dataset)} samples')
 cat > /home4cluster/lora_train/train_alpaca.py << 'EOF'
 import os
 import time
+import random
+import csv
 import torch
+import numpy as np
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -277,25 +280,34 @@ from peft import get_peft_model, LoraConfig, TaskType
 from torch.utils.data import Dataset, DataLoader, DistributedSampler
 from datasets import load_from_disk
 
+# 設定
 MODEL_PATH = "/home4cluster/models/Qwen2.5-7B-Instruct"
 DATASET_PATH = "/home4cluster/datasets/alpaca"
 NUM_SAMPLES = 1000
 SEQ_LEN = 512
 WARMUP_STEPS = 5
+BATCH_SIZE = 1
+LORA_R = 8
+LORA_ALPHA = 16
+SEED = 42
+LOG_DIR = "/home4cluster/lora_train/logs"
+CONNECT_TYPE = os.environ.get("CONNECT_TYPE", "unknown")
+
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 class AlpacaDataset(Dataset):
     def __init__(self, tokenizer, num_samples=NUM_SAMPLES, seq_len=SEQ_LEN):
         dataset = load_from_disk(DATASET_PATH)
-        self.tokenizer = tokenizer
-        self.seq_len = seq_len
         self.samples = []
-
         for item in dataset.select(range(num_samples)):
             prompt = f"### Instruction:\n{item['instruction']}\n"
             if item['input']:
                 prompt += f"### Input:\n{item['input']}\n"
             prompt += f"### Response:\n{item['output']}"
-
             encoded = tokenizer(
                 prompt,
                 max_length=seq_len,
@@ -315,6 +327,7 @@ class AlpacaDataset(Dataset):
         return self.samples[idx]
 
 def main():
+    set_seed(SEED)
     dist.init_process_group(backend="nccl")
     rank = dist.get_rank()
     world_size = dist.get_world_size()
@@ -322,8 +335,15 @@ def main():
     device = torch.device("cuda", 0)
 
     if rank == 0:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        print(f"=== 実験設定 ===")
         print(f"world_size: {world_size}")
-        print(f"Loading model from {MODEL_PATH}")
+        print(f"connect_type: {CONNECT_TYPE}")
+        print(f"num_samples: {NUM_SAMPLES}")
+        print(f"seq_len: {SEQ_LEN}")
+        print(f"batch_size: {BATCH_SIZE}")
+        print(f"lora_r: {LORA_R}")
+        print(f"seed: {SEED}")
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
     tokenizer.pad_token = tokenizer.eos_token
@@ -335,8 +355,8 @@ def main():
 
     lora_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
-        r=8,
-        lora_alpha=16,
+        r=LORA_R,
+        lora_alpha=LORA_ALPHA,
         target_modules=["q_proj", "v_proj"],
         lora_dropout=0.05,
     )
@@ -347,43 +367,76 @@ def main():
     model = DDP(model, device_ids=[0])
 
     dataset = AlpacaDataset(tokenizer)
-    sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank)
-    dataloader = DataLoader(dataset, batch_size=1, sampler=sampler)
+    sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, seed=SEED)
+    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, sampler=sampler)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
     model.train()
-    total_loss = 0
+    total_loss = 0.0
     steps = 0
     start = None
+    step_times = []
+    step_start = None
 
     for batch in dataloader:
         input_ids = batch["input_ids"].to(device)
         labels = batch["labels"].to(device)
+
+        step_start = time.time()
         outputs = model(input_ids=input_ids, labels=labels)
         loss = outputs.loss
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
+        torch.cuda.synchronize()
+        step_end = time.time()
+
         steps += 1
 
-        # ウォームアップ後に計測開始
         if steps == WARMUP_STEPS:
             torch.cuda.synchronize()
             start = time.time()
 
         if steps > WARMUP_STEPS:
             total_loss += loss.detach().item()
+            step_times.append(step_end - step_start)
 
     torch.cuda.synchronize()
     elapsed = time.time() - start
     measured_steps = steps - WARMUP_STEPS
+    avg_loss = total_loss / measured_steps
+    throughput = measured_steps * world_size / elapsed
+    avg_step_time = sum(step_times) / len(step_times)
 
     if rank == 0:
+        print(f"\n=== 結果 ===")
         print(f"steps: {steps} (warmup: {WARMUP_STEPS}, measured: {measured_steps})")
-        print(f"avg_loss: {total_loss/measured_steps:.4f}")
+        print(f"avg_loss: {avg_loss:.4f}")
         print(f"elapsed: {elapsed:.1f}s")
-        print(f"throughput: {measured_steps * world_size / elapsed:.2f} samples/sec")
+        print(f"throughput: {throughput:.2f} samples/sec")
+        print(f"avg_step_time: {avg_step_time:.3f}s/step")
+
+        # CSVに保存
+        csv_path = f"{LOG_DIR}/results.csv"
+        file_exists = os.path.exists(csv_path)
+        with open(csv_path, "a", newline="") as f:
+            writer = csv.writer(f)
+            if not file_exists:
+                writer.writerow([
+                    "timestamp", "world_size", "connect_type",
+                    "num_samples", "seq_len", "batch_size", "lora_r", "seed",
+                    "measured_steps", "avg_loss", "elapsed",
+                    "throughput", "avg_step_time"
+                ])
+            writer.writerow([
+                time.strftime("%Y-%m-%d %H:%M:%S"),
+                world_size, CONNECT_TYPE,
+                NUM_SAMPLES, SEQ_LEN, BATCH_SIZE, LORA_R, SEED,
+                measured_steps, f"{avg_loss:.4f}", f"{elapsed:.1f}",
+                f"{throughput:.2f}", f"{avg_step_time:.3f}"
+            ])
+        print(f"ログ保存: {csv_path}")
 
     dist.destroy_process_group()
 
@@ -392,6 +445,27 @@ if __name__ == "__main__":
 EOF
 ```
 
-
+## LoRLチューニング
+### 1node
+1nodeでのLoRAチューニング
+```
+cat > /home4cluster/lora_train/run_alpaca_1node.sh << 'EOF'
+#!/bin/bash
+ssh mprg@node15 "docker run --rm --gpus all --network host \
+    --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+    -v /home4cluster:/home4cluster \
+    -v /home/mprg/nccl-build:/home/mprg/nccl-build \
+    -e LD_PRELOAD=/home/mprg/nccl-build/lib/libnccl.so \
+    -e NCCL_SOCKET_IFNAME=enP7s7 \
+    -e NCCL_IB_DISABLE=1 \
+    -e NCCL_NET=Socket \
+    nvcr.io/nvidia/pytorch:25.05-py3 \
+    bash -c 'pip install -q peft transformers datasets && torchrun \
+        --nnodes=1 --nproc_per_node=1 \
+        --master_addr=localhost --master_port=29500 \
+        /home4cluster/lora_train/train_alpaca.py'"
+EOF
+chmod +x /home4cluster/lora_train/run_alpaca_1node.sh
+```
 
 
