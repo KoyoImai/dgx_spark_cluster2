@@ -1,4 +1,4 @@
-# ステップ8：LLMの学習（Qwen2.5-7B-Instruct+フルファインチューニング+tatsu-lab/alpaca）]
+# ステップ8：LLMの学習（Qwen2.5-7B-Instruct+フルファインチューニング+tatsu-lab/alpaca）
 
 ## フルファインチューニング学習速度比較結果
 
