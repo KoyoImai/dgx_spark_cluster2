@@ -217,5 +217,35 @@ if __name__ == "__main__":
 EOF
 ```
 
+## ステップ9.2：1nodeでの学習
+### 起動スクリプトの作成
+```
+for BS in 1 2 4 8 16; do
+cat > /home4cluster/lora_train/run_bs${BS}_1node.sh << EOF
+#!/bin/bash
+ssh mprg@node15 "docker run --rm --gpus all --network host \\
+    --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \\
+    -v /home4cluster:/home4cluster \\
+    -v /home/mprg/nccl-build:/home/mprg/nccl-build \\
+    -e LD_PRELOAD=/home/mprg/nccl-build/lib/libnccl.so \\
+    -e NCCL_SOCKET_IFNAME=enP7s7 \\
+    -e NCCL_IB_DISABLE=1 \\
+    -e NCCL_NET=Socket \\
+    -e CONNECT_TYPE=none \\
+    -e BATCH_SIZE=${BS} \\
+    nvcr.io/nvidia/pytorch:25.05-py3 \\
+    bash -c 'pip install -q peft transformers datasets && torchrun \\
+        --nnodes=1 --nproc_per_node=1 \\
+        --master_addr=localhost --master_port=29500 \\
+        /home4cluster/lora_train/train_alpaca_bs.py'"
+EOF
+chmod +x /home4cluster/lora_train/run_bs${BS}_1node.sh
+done
+echo "全スクリプト作成完了"
+```
 
+### 学習の実行
+```
+bash /home4cluster/lora_train/run_bs1_1node.sh
+```
 
