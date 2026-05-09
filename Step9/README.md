@@ -32,6 +32,17 @@
 | 16 | 5.57 samples/sec | 5.724s | 155.0s |  |  |
 
 
+## バッチサイズ変更実験結果（LoRA, 4node-RJ45）
+
+| batch_size | throughput | avg_step_time | elapsed | peak_vram | 対1node-bs1比 |
+|-----------|-----------|---------------|---------|-----------|--------------|
+| 1 | 8.27 samples/sec | 0.466s | 118.5s |  |  |
+| 2 | 4.78 samples/sec | 0.821s | 205.2s |  |  |
+| 4 | 5.12 samples/sec | 1.546s | 187.6s |  |  |
+| 8 | 5.27 samples/sec | 3.017s | 175.9s |  |  |
+| 16 | 5.57 samples/sec | 5.724s | 155.0s |  |  |
+
+
 
 ## ステップ9.1：学習スクリプトの作成
 管理者nodeで以下のコマンドを実行し，学習スクリプトを作成してください．
@@ -437,10 +448,77 @@ bash /home4cluster/lora_train/run_bs8_2node_qsfp.sh
 ```
 
 
-# バッチサイズ16
+バッチサイズ16
 ```
 # /home4cluster/lora_train/logs/2node_qsfp_bs16_20260509_115302_steps.csv
 bash /home4cluster/lora_train/run_bs16_2node_qsfp.sh
 ```
 
+
+
+## ステップ9.4：4node（RJ45）での学習
+### 起動スクリプトの作成
+```
+for BS in 1 2 4 8 16; do
+cat > /home4cluster/lora_train/run_bs${BS}_4node_rj45.sh << EOF
+#!/bin/bash
+MASTER_ADDR="10.0.0.15"; MASTER_PORT="29500"; NNODES=4
+NODES=("node15" "node16" "node17" "node18")
+for i in "\${!NODES[@]}"; do
+    NODE=\${NODES[\$i]}; RANK=\$i
+    ssh mprg@\$NODE "docker run --rm --gpus all --network host \\
+        --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \\
+        -v /home4cluster:/home4cluster \\
+        -v /home/mprg/nccl-build:/home/mprg/nccl-build \\
+        -e LD_PRELOAD=/home/mprg/nccl-build/lib/libnccl.so \\
+        -e NCCL_SOCKET_IFNAME=enP7s7 \\
+        -e NCCL_IB_DISABLE=1 \\
+        -e NCCL_NET=Socket \\
+        -e CONNECT_TYPE=rj45 \\
+        -e BATCH_SIZE=${BS} \\
+        nvcr.io/nvidia/pytorch:25.05-py3 \\
+        bash -c 'pip install -q peft transformers datasets && torchrun \\
+            --nnodes=\$NNODES --nproc_per_node=1 \\
+            --master_addr=\$MASTER_ADDR --master_port=\$MASTER_PORT \\
+            --node_rank=\$RANK \\
+            /home4cluster/lora_train/train_alpaca_bs.py'" &
+done; wait
+EOF
+chmod +x /home4cluster/lora_train/run_bs${BS}_4node_rj45.sh
+done
+echo "全スクリプト作成完了"
+```
+
+
+### 学習の実行
+バッチサイズ1
+```
+# /home4cluster/lora_train/logs/4node_rj45_bs1_20260509_120408_steps.csv
+bash /home4cluster/lora_train/run_bs1_4node_rj45.sh
+```
+
+バッチサイズ2
+```
+
+bash /home4cluster/lora_train/run_bs2_4node_rj45.sh
+```
+
+バッチサイズ4
+```
+
+bash /home4cluster/lora_train/run_bs4_4node_rj45.sh
+```
+
+
+バッチサイズ8
+```
+bash /home4cluster/lora_train/run_bs8_4node_rj45.sh
+```
+
+
+バッチサイズ16
+```
+
+bash /home4cluster/lora_train/run_bs16_4node_rj45.sh
+```
 
