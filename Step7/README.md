@@ -251,6 +251,21 @@ chmod +x /home4cluster/lora_train/run_4node_rj45.sh
 bash /home4cluster/lora_train/run_4node_rj45.sh
 ```
 
+## tatsu-lab/alpacaデータセットのダウンロード
+管理者nodeで以下のコマンドを実行してください．
+```
+docker run --rm \
+  -v /home4cluster:/home4cluster \
+  nvcr.io/nvidia/pytorch:25.05-py3 \
+  bash -c "pip install -q huggingface_hub datasets && python3 -c \"
+from datasets import load_dataset
+dataset = load_dataset('tatsu-lab/alpaca', split='train')
+dataset.save_to_disk('/home4cluster/datasets/alpaca')
+print(f'Download complete: {len(dataset)} samples')
+\""
+```
+
+
 
 
 
