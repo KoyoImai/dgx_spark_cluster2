@@ -69,7 +69,7 @@ LoRAは各モジュールに `A`（r×in）と `B`（out×r）の2行列を追�
 |-----------|-----------|---------------|---------|-----------|---------|
 | 16 | 4.06 samples/sec | 0.475s | 243.9s |  |  |
 | 32 | 4.08 samples/sec | 0.473s | 242.4s |  |  |
-| 64 | 2.11 samples/sec | 0.456s | 472.6s |  |  |
+| 64 | 3.91 samples/sec | 0.494s | 253.3s |  |  |
 | 128 | 2.03 samples/sec | 0.473s | 489.2s |  |  |
 
 
@@ -488,7 +488,10 @@ bash /home4cluster/lora_train/run_r32_4node_rj45.sh
 bash /home4cluster/lora_train/run_r64_1node.sh
 
 # 2node(RJ45)
+# /home4cluster/lora_train/logs/2node_rj45_r64_20260509_154147_steps.csv
 bash /home4cluster/lora_train/run_r64_2node_rj45.sh
+
+
 bash /home4cluster/lora_train/run_r64_2node_qsfp.sh
 bash /home4cluster/lora_train/run_r64_4node_rj45.sh
 ```
