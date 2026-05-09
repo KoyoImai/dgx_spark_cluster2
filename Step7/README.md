@@ -1,6 +1,6 @@
-# LLMの学習（???+LoRA）
+# ステップ7：LLMの学習（???+LoRA）
 
-## モデルのダウンロード
+## ステップ7.1：モデルのダウンロード
 管理者nodeで以下のコマンドを実行してください．
 ```
 mkdir -p /home4cluster/models
@@ -18,7 +18,8 @@ print('Download complete')
 "
 ```
 
-## 1node-LoRAチューニング
+## ステップ7.2：動作確認
+### 1node-LoRAチューニング
 LoRAチューニング用のスクリプトを作成します．
 ```
 mkdir -p /home4cluster/lora_train
@@ -141,7 +142,7 @@ chmod +x /home4cluster/lora_train/run_1node.sh
 bash /home4cluster/lora_train/run_1node.sh
 ```
 
-## 2node-LoRAチューニング(RJ45)
+### 2node-LoRAチューニング(RJ45)
 ```
 cat > /home4cluster/lora_train/run_2node_rj45.sh << 'EOF'
 #!/bin/bash
@@ -176,7 +177,7 @@ EOF
 chmod +x /home4cluster/lora_train/run_2node_rj45.sh
 ```
 
-## 2node-LoRAチューニング(QSFP)
+### 2node-LoRAチューニング(QSFP)
 ```
 cat > /home4cluster/lora_train/run_2node_qsfp.sh << 'EOF'
 #!/bin/bash
@@ -213,7 +214,7 @@ bash /home4cluster/lora_train/run_2node_qsfp.sh
 ```
 
 
-## 4node-LoRAチューニング(RJ45)
+### 4node-LoRAチューニング(RJ45)
 ```
 cat > /home4cluster/lora_train/run_4node_rj45.sh << 'EOF'
 #!/bin/bash
