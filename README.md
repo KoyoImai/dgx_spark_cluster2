@@ -29,7 +29,7 @@
 
 **[ステップ6：Dockerなどの環境構築](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step6)**
 
-**[ステップ7：ステップ7：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step7)**
+**[ステップ7：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step7)**
 
 **[ステップN：LLMの推論](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/StepN)**
 
