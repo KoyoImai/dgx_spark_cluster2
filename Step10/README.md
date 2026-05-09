@@ -437,6 +437,19 @@ bash /home4cluster/lora_train/run_r64_2node_rj45.sh
 bash /home4cluster/lora_train/run_r64_2node_qsfp.sh
 bash /home4cluster/lora_train/run_r64_4node_rj45.sh
 ```
+
+### r=128
+
+```bash
+# node1
+# 
+bash /home4cluster/lora_train/run_r128_1node.sh
+
+
+bash /home4cluster/lora_train/run_r128_2node_rj45.sh
+bash /home4cluster/lora_train/run_r128_2node_qsfp.sh
+bash /home4cluster/lora_train/run_r128_4node_rj45.sh
+```
  
 ---
  
