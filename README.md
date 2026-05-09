@@ -33,7 +33,7 @@
 
 **[ステップ8：LLMの学習（Qwen2.5-7B-Instruct+フルファインチューニング+tatsu-lab/alpaca）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step8)**
 
-**[ステップ9：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step9)**
+**[ステップ9：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）-バッチサイズ変更](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step9)**
 
 **[ステップN：LLMの推論](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/StepN)**
 
