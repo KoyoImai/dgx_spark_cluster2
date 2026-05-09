@@ -250,8 +250,28 @@ echo "全スクリプト作成完了"
 # log: /home4cluster/lora_train/logs/1node_none_bs1_20260509_093756_steps.csv
 bash /home4cluster/lora_train/run_bs1_1node.sh
 ```
+
 バッチサイズ2
 ```
+# /home4cluster/lora_train/logs/1node_none_bs2_20260509_094810_steps.csv
 bash /home4cluster/lora_train/run_bs2_1node.sh
+```
+
+バッチサイズ4
+```
+# /home4cluster/lora_train/logs/1node_none_bs4_20260509_095732_steps.csv
+bash /home4cluster/lora_train/run_bs2_1node.sh
+```
+
+バッチサイズ8
+```
+# /home4cluster/lora_train/logs/1node_none_bs8_20260509_100709_steps.csv
+bash /home4cluster/lora_train/run_bs8_1node.sh
+```
+
+バッチサイズ16
+```
+# /home4cluster/lora_train/logs/1node_none_bs16_20260509_101627_steps.csv
+bash /home4cluster/lora_train/run_bs16_1node.sh
 ```
 
