@@ -60,6 +60,7 @@ LoRAは各モジュールに `A`（r×in）と `B`（out×r）の2行列を追�
 | 16 | 2.12 samples/sec | 0.454s | 469.8s |  |  |
 | 32 | 2.09 samples/sec | 0.460s | 475.7s |  |  |
 | 64 | 2.11 samples/sec | 0.456s | 472.6s |  |  |
+| 128 | 2.03 samples/sec | 0.473s | 489.2s |  |  |
 
 
 ## バッチサイズ変更実験結果（LoRA, 2node-RJ45）
@@ -495,7 +496,7 @@ bash /home4cluster/lora_train/run_r64_4node_rj45.sh
 
 ```bash
 # node1
-# 
+# /home4cluster/lora_train/logs/1node_none_r128_20260509_151645_steps.csv
 bash /home4cluster/lora_train/run_r128_1node.sh
 
 
