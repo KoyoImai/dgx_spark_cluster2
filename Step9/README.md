@@ -413,7 +413,7 @@ echo "全スクリプト作成完了"
 ### 学習の実行
 バッチサイズ1
 ```
-# 
+# /home4cluster/lora_train/logs/2node_qsfp_bs1_20260509_112242_steps.csv
 bash /home4cluster/lora_train/run_bs1_2node_qsfp.sh
 ```
 
