@@ -20,12 +20,12 @@
 
 ### 結果
 
-| 構成 | throughput | avg_step_time | speedup | scaling efficiency |
-|------|-----------|---------------|---------|-------------------|
-| 1node | 2.14 samples/sec | 0.450s | 1.00x | 100% |
-| 2node-RJ45 | 4.14 samples/sec | 0.465s | 1.93x | 97% |
-| 2node-QSFP | 4.16 samples/sec | 0.463s | 1.94x | 97% |
-| 4node-RJ45 | 8.27 samples/sec | 0.466s | 3.86x | 97% |
+|     構成    |    throughput    |    elapsed    | avg_step_time  | speedup | scaling efficiency |
+|------------|------------------|---------------|----------------|---------|--------------------|
+| 1node      | 2.14 samples/sec |    464.9s     |     0.450s     |  1.00x  | 100%               |
+| 2node-RJ45 | 4.14 samples/sec |    239.2s     |     0.465s     |  1.93x  | 97%                |
+| 2node-QSFP | 4.16 samples/sec |    237.7s     |     0.463s     |  1.94x  | 97%                |
+| 4node-RJ45 | 8.27 samples/sec |    118.5s     |     0.466s     |  3.86x  | 97%                |
 
 ### 考察
 
