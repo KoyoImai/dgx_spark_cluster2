@@ -1,4 +1,4 @@
-# ステップ7：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）
+# ステップ102：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）
 
 ## LoRAチューニング学習速度比較結果
 ### 実験設定
@@ -34,7 +34,7 @@
 - avg_step_timeがどの構成でも0.45〜0.47sとほぼ同じであり、通信オーバーヘッドが学習時間に影響していないことを示している
 - QSFPの効果はフルファインチューニングや大きなLoRA rank（r値）を使用する場合に顕在化すると考えられる
 
-## ステップ7.1：モデルのダウンロード
+## ステップ102.1：モデルのダウンロード
 管理者nodeで以下のコマンドを実行してください．
 ```
 mkdir -p /home4cluster/models
@@ -52,7 +52,7 @@ print('Download complete')
 "
 ```
 
-## ステップ7.2：動作確認
+## ステップ102.2：動作確認
 ### 1node-LoRAチューニング
 LoRAチューニング用のスクリプトを作成します．
 ```
@@ -287,7 +287,7 @@ chmod +x /home4cluster/lora_train/run_4node_rj45.sh
 bash /home4cluster/lora_train/run_4node_rj45.sh
 ```
 
-## ステップ7.3：tatsu-lab/alpacaデータセットのダウンロード & 学習スクリプト作成
+## ステップ102.3：tatsu-lab/alpacaデータセットのダウンロード & 学習スクリプト作成
 管理者nodeで以下のコマンドを実行してください．
 ```
 docker run --rm \
@@ -511,7 +511,7 @@ if __name__ == "__main__":
 EOF
 ```
 
-## ステップ7.4：LoRAチューニング
+## ステップ102.4：LoRAチューニング
 ### 1node
 1nodeでのLoRAチューニング
 ```
