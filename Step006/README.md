@@ -111,3 +111,20 @@ sudo bash -c 'cat >> /etc/hosts << EOF
 EOF'
 ```
 
+
+## ステップ006.7：リンク速度の設定と確認
+node15で以下のコマンドを実行して，リンク速度を確認してください．
+```
+mprg@spark-fb97:~$ sudo ethtool enp1s0f0np0 | grep Speed
+[sudo] mprg のパスワード: 
+	Speed: 100000Mb/s
+mprg@spark-fb97:~$ 
+```
+速度を確認すると`100Gbps=100000Mb/s`になっています．
+スイッチ側でポートの速度を200Gbpsに手動設定し直す必要があります．
+
+
+
+
+
+
