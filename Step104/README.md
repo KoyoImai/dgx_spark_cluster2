@@ -1,4 +1,4 @@
-# ステップ9：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）-バッチサイズ変更-
+# ステップ104：LLMの学習（Qwen2.5-7B-Instruct+LoRA+tatsu-lab/alpaca）-バッチサイズ変更-
 
 ## バッチサイズ変更実験結果（LoRA, 1node）
 
@@ -44,7 +44,7 @@
 
 
 
-## ステップ9.1：学習スクリプトの作成
+## ステップ104.1：学習スクリプトの作成
 管理者nodeで以下のコマンドを実行し，学習スクリプトを作成してください．
 ```
 cat > /home4cluster/lora_train/train_alpaca_bs.py << 'EOF'
@@ -260,7 +260,7 @@ if __name__ == "__main__":
 EOF
 ```
 
-## ステップ9.2：1nodeでの学習
+## ステップ104.2：1nodeでの学習
 ### 起動スクリプトの作成
 ```
 for BS in 1 2 4 8 16 32; do
