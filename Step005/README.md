@@ -1,1 +1,268 @@
+## ステップ５：QSFPの4台接続（2ペア＋クロス接続）
+QSFPケーブルでDGX Sparkを4台接続します。
+接続構成は「2ペア＋クロス接続」で、以下の構成にします。
+```
+【現在】
+node15(enp1s0f0np0) ↔ node16(enp1s0f0np0)（ケーブル1・既存）
+node17(enp1s0f0np0) ↔ node18(enp1s0f0np0)（ケーブル2・既存）
+
+【追加】
+node15(enp1s0f1np1) ↔ node17(enp1s0f1np1)（ケーブル3・新規）
+node16(enp1s0f1np1) ↔ node18(enp1s0f1np1)（ケーブル4・新規）
+```
+上記の通りにDGX SparkをQSFPケーブルで接続します。
+
+（追記5/3 16:19）
+以下の構成でipアドレスを固定しました。
+```
+【既存ペア】
+node15(enp1s0f0np0): 10.0.1.1 ↔ node16(enp1s0f0np0): 10.0.1.2
+node17(enp1s0f0np0): 10.0.2.1 ↔ node18(enp1s0f0np0): 10.0.2.2
+
+【追加クロス】
+node15(enp1s0f1np1): 10.0.3.1 ↔ node17(enp1s0f1np1): 10.0.3.2
+node16(enp1s0f1np1): 10.0.4.1 ↔ node18(enp1s0f1np1): 10.0.4.2
+```
+
+
+
+### node15でip固定
+QSFPインターフェースの状態を確認します。
+以下のコマンドを実行してください。
+```
+mprg@spark-fb97:~$ ibdev2netdev
+roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Up)
+roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Up)
+rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
+rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
+mprg@spark-fb97:~$ 
+```
+`enp1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
+以下のコマンドをnode15で実行してください。
+```
+sudo tee /etc/netplan/41-cx7-p2.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f1np1:
+      addresses:
+        - 10.0.3.1/24
+      dhcp4: no
+EOF
+
+sudo chmod 600 /etc/netplan/41-cx7-p2.yaml
+sudo netplan apply
+```
+ipアドレスが正しく設定されているか確認します。
+`ip a show enp1s0f1np1`を実行してください。
+```
+mprg@spark-fb97:~$ ip a show enp1s0f1np1
+4: enp1s0f1np1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 4c:bb:47:2f:fb:99 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.3.1/24 brd 10.0.3.255 scope global noprefixroute enp1s0f1np1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::4ebb:47ff:fe2f:fb99/64 scope link 
+       valid_lft forever preferred_lft forever
+mprg@spark-fb97:~$
+```
+上記の結果から`enp1s0f1np1`インターフェースのipが`10.0.3.1`に設定されていることが確認できます。
+
+
+### node17でip固定
+QSFPインターフェースの状態を確認します。
+以下のコマンドを実行してください。
+```
+mprg@spark-755c:~$ ibdev2netdev
+roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Up)
+roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Up)
+rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
+rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
+mprg@spark-755c:~$ 
+```
+`enp1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
+以下のコマンドをnode17で実行してください。
+```
+sudo tee /etc/netplan/41-cx7-p2.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f1np1:
+      addresses:
+        - 10.0.3.2/24
+      dhcp4: no
+EOF
+
+sudo chmod 600 /etc/netplan/41-cx7-p2.yaml
+sudo netplan apply
+```
+ipアドレスが正しく設定されているか確認します。
+`ip a show enp1s0f1np1`を実行してください。
+```
+mprg@spark-755c:~$ ip a show enp1s0f1np1
+4: enp1s0f1np1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 4c:bb:47:2a:75:5e brd ff:ff:ff:ff:ff:ff
+    inet 10.0.3.2/24 brd 10.0.3.255 scope global noprefixroute enp1s0f1np1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::4ebb:47ff:fe2a:755e/64 scope link 
+       valid_lft forever preferred_lft forever
+mprg@spark-755c:~$
+```
+上記の結果から`enp1s0f1np1`インターフェースのipが`10.0.3.2`に設定されていることが確認できます。
+
+
+### node16でip固定
+QSFPインターフェースの状態を確認します。
+以下のコマンドを実行してください。
+```
+mprg@spark-4440:~$ ibdev2netdev
+roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Up)
+roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Up)
+rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
+rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
+mprg@spark-4440:~$
+```
+`enp1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
+以下のコマンドをnode16で実行してください。
+```
+sudo tee /etc/netplan/41-cx7-p2.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f1np1:
+      addresses:
+        - 10.0.4.1/24
+      dhcp4: no
+EOF
+
+sudo chmod 600 /etc/netplan/41-cx7-p2.yaml
+sudo netplan apply
+```
+ipアドレスが正しく設定されているか確認します。
+`ip a show enp1s0f1np1`を実行してください。
+```
+mprg@spark-4440:~$ ip a show enp1s0f1np1
+4: enp1s0f1np1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 4c:bb:47:2f:44:42 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.4.1/24 brd 10.0.4.255 scope global noprefixroute enp1s0f1np1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::4ebb:47ff:fe2f:4442/64 scope link 
+       valid_lft forever preferred_lft forever
+mprg@spark-4440:~$
+```
+上記の結果から`enp1s0f1np1`インターフェースのipが`10.0.4.1`に設定されていることが確認できます。
+
+
+
+### node18でip固定
+QSFPインターフェースの状態を確認します。
+以下のコマンドを実行してください。
+```
+mprg@spark-07a2:~$ ibdev2netdev
+roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Up)
+roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Up)
+rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
+rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
+mprg@spark-07a2:~$
+```
+`enp1s0f1np1 (Up)`となっているため、このインターフェースを使用します。
+以下のコマンドをnode18で実行してください。
+```
+sudo tee /etc/netplan/41-cx7-p2.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f1np1:
+      addresses:
+        - 10.0.4.2/24
+      dhcp4: no
+EOF
+
+sudo chmod 600 /etc/netplan/41-cx7-p2.yaml
+sudo netplan apply
+```
+ipアドレスが正しく設定されているか確認します。
+`ip a show enp1s0f1np1`を実行してください。
+```
+mprg@spark-07a2:~$ ip a show enp1s0f1np1
+4: enp1s0f1np1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 4c:bb:47:2e:07:a4 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.4.2/24 brd 10.0.4.255 scope global noprefixroute enp1s0f1np1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::4ebb:47ff:fe2e:7a4/64 scope link 
+       valid_lft forever preferred_lft forever
+mprg@spark-07a2:~$
+```
+
+
+## 接続確認
+### node15 ⇔ node17
+node15で`ping -c 3 10.0.3.2`を実行して接続できるかを確認します。
+```
+mprg@spark-fb97:~$ ping -c 3 10.0.3.2
+PING 10.0.3.2 (10.0.3.2) 56(84) bytes of data.
+64 bytes from 10.0.3.2: icmp_seq=1 ttl=64 time=1.40 ms
+64 bytes from 10.0.3.2: icmp_seq=2 ttl=64 time=1.27 ms
+64 bytes from 10.0.3.2: icmp_seq=3 ttl=64 time=1.24 ms
+
+--- 10.0.3.2 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+rtt min/avg/max/mdev = 1.239/1.302/1.400/0.069 ms
+```
+
+node17で`ping -c 3 10.0.3.1`を実行して接続できるかを確認します。
+```
+mprg@spark-755c:~$ ping -c 3 10.0.3.1
+PING 10.0.3.1 (10.0.3.1) 56(84) bytes of data.
+64 bytes from 10.0.3.1: icmp_seq=1 ttl=64 time=0.680 ms
+64 bytes from 10.0.3.1: icmp_seq=2 ttl=64 time=0.707 ms
+64 bytes from 10.0.3.1: icmp_seq=3 ttl=64 time=0.848 ms
+
+--- 10.0.3.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2031ms
+rtt min/avg/max/mdev = 0.680/0.745/0.848/0.073 ms
+```
+
+### node16 ⇔ node18
+node16で`ping -c 3 10.0.4.2`を実行して接続できるかを確認します。
+```
+mprg@spark-4440:~$ ping -c 3 10.0.4.2
+PING 10.0.4.2 (10.0.4.2) 56(84) bytes of data.
+64 bytes from 10.0.4.2: icmp_seq=1 ttl=64 time=1.40 ms
+64 bytes from 10.0.4.2: icmp_seq=2 ttl=64 time=1.30 ms
+64 bytes from 10.0.4.2: icmp_seq=3 ttl=64 time=1.19 ms
+
+--- 10.0.4.2 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2005ms
+rtt min/avg/max/mdev = 1.187/1.295/1.397/0.085 ms
+```
+
+node18で`ping -c 3 10.0.4.1`を実行して接続できるかを確認します。
+```
+mprg@spark-07a2:~$ ping -c 3 10.0.4.1
+PING 10.0.4.1 (10.0.4.1) 56(84) bytes of data.
+64 bytes from 10.0.4.1: icmp_seq=1 ttl=64 time=0.924 ms
+64 bytes from 10.0.4.1: icmp_seq=2 ttl=64 time=1.20 ms
+64 bytes from 10.0.4.1: icmp_seq=3 ttl=64 time=1.47 ms
+
+--- 10.0.4.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+rtt min/avg/max/mdev = 0.924/1.198/1.470/0.222 ms
+```
+
+## `/etc/hostsの設定追記`
+全てのnodeで以下の内容を`/etc/hosts`に追加してください。
+```
+sudo bash -c 'cat >> /etc/hosts << EOF
+
+# QSFP high-speed network
+10.0.1.1   node15-qsfp1
+10.0.1.2   node16-qsfp1
+10.0.2.1   node17-qsfp1
+10.0.2.2   node18-qsfp1
+10.0.3.1   node15-qsfp2
+10.0.3.2   node17-qsfp2
+10.0.4.1   node16-qsfp2
+10.0.4.2   node18-qsfp2
+EOF'
+```
 
