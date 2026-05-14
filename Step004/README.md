@@ -1,4 +1,4 @@
-## ステップ４：QSFPの2台接続
+## ステップ004：QSFPの2台接続
 
 **[参考1:DGX Sparkの2台接続](https://build.nvidia.com/spark/connect-two-sparks/stacked-sparks)** \
 **[参考２:DGX Sparkの2台接続](https://dev.classmethod.jp/articles/dgx-spark-two-node-clustering/)**
