@@ -17,7 +17,7 @@ sudo usermod -aG docker mprg
 同様の手順で全ての計算nodeと管理者nodeでDockerグループに追加してください．
 
 
-## ステップ6.2：Dockerの用意
+## ステップ101.2：Dockerの用意
 まず，Dockerの用意から行います．
 以下のコマンドを全ての計算nodeで実行してください．
 ```
@@ -44,7 +44,7 @@ wait
 echo "全nodeのビルド完了"
 ```
 
-## ステップ6.3：NCCLの準備
+## ステップ101.3：NCCLの準備
 全ての計算nodeでNCCLをビルドします．
 以下のコマンドを全ての計算nodeで実行してください．
 ```
@@ -70,7 +70,7 @@ make MPI=1 \
   MPI_HOME=/usr/lib/aarch64-linux-gnu/openmpi
 ```
 
-## ステップ6.4：計算node間でのssh鍵の共有
+## ステップ101.4：計算node間でのssh鍵の共有
 計算node間でssh鍵を共有します．
 node15で以下を実行してください．
 ```
@@ -83,7 +83,7 @@ ssh-copy-id mprg@10.0.0.18
 ```
 
 
-## ステップ6.5：NCCLの多node通信テスト
+## ステップ101.5：NCCLの多node通信テスト
 ### 2台-RJ45接続
 node15で以下のコマンドを実行し，node15とnode16でNCCLテストを行います．
 ```
