@@ -137,5 +137,5 @@ pingがとおれば問題ありません。
 ログイン後、左上にある`≡`、`Advanced`、`Interface`の順にクリックしてください。
 Interface画面が開くと、QSFPポートなどのリスト（qsfp56-1-1、qsfp56-1-2など）が表示されると思います。
 
-
+`qsfp56-1-1`をクリックし、その後、`Ethernet`セクションを展開、`Auto Negotiation`をオフにして`Ok`を押してください。
 
