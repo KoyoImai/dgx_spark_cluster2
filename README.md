@@ -6,7 +6,7 @@
 ・QSFPケーブル2本 \
 ・LANケーブル6本 \
 ・[USB-Cハブ](https://www.ankerjapan.com/products/a8352?srsltid=AfmBOoq95ZKB998T5GecohoCODQpk4HWPhwSNI8mhbB-wakpWkvt89U1)（管理者nodeのRJ45増設用） \
-・QSFPケーブル対応スイッチ（4台までQSFPで接続可能）
+・[QSFPケーブル対応スイッチ（4台までQSFPで接続可能）](https://mikrotik.com/product/crs812_ddq)
 
 
 ## 構成（予定）
