@@ -16,15 +16,15 @@
 ・管理者nodeのみ研究室インターネットに接続しユーザーがログイン可能
 
 ## クラスタ構築
-**[ステップ00１：ipアドレスの固定](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step001)**
+**[ステップ001：ipアドレスの固定](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step001)**
 
-**[ステップ00２：NFSサーバーのインストール](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step002)**
+**[ステップ002：NFSサーバーのインストール](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step002)**
 
-**[ステップ00３：NAT（インターネット接続の共有）の設定](https://github.com/KoyoImai/dgx_spark_cluster2/blob/main/Step003)**
+**[ステップ003：NAT（インターネット接続の共有）の設定](https://github.com/KoyoImai/dgx_spark_cluster2/blob/main/Step003)**
 
-**[ステップ00４：QSFPの2台接続](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step004)**
+**[ステップ004：QSFPの2台接続](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step004)**
 
-**[ステップ00５：QSFPの4台接続（2ペア＋クロス接続）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step005)**
+**[ステップ005：QSFPの4台接続（2ペア＋クロス接続）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step005)**
 
 ## LLMの学習＆推論
 
