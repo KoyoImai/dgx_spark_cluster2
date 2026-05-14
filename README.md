@@ -26,6 +26,8 @@
 
 **[ステップ005：QSFPの4台接続（2ペア＋クロス接続）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step005)**
 
+**[ステップ006：QSFPの4台接続（QSFPスイッチ）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step00６)**
+
 ## LLMの学習＆推論
 
 **[ステップ101：Dockerなどの環境構築](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step101)**
