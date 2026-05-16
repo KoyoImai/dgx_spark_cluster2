@@ -40,6 +40,101 @@ pingが問題なく通っていれば、ブラウザで`http://192.168.88.1`を�
 `≡` → `Bridge` → Bridge タブ を開き、bridge1（デフォルト）が存在するか確認。
 なければ作成。
 
+#### 2:速度を調整
+面倒なので後回し．
+
+
+## Phase 3：netplan設定（IP割り当て）
+netplan設定を計算nodeで順番に行います．
+
+### node15
+node15で以下のコマンドを実行してください．
+```
+sudo tee /etc/netplan/41-cx7-sw.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f1np1:
+      addresses:
+        - 10.0.5.15/24
+      dhcp4: no
+EOF
+sudo chmod 600 /etc/netplan/41-cx7-sw.yaml
+sudo netplan apply
+ip a show enp1s0f1np1 | grep inet
+```
+
+### node16
+node16で以下のコマンドを実行してください．
+```
+sudo tee /etc/netplan/41-cx7-sw.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f1np1:
+      addresses:
+        - 10.0.5.16/24
+      dhcp4: no
+EOF
+sudo chmod 600 /etc/netplan/41-cx7-sw.yaml
+sudo netplan apply
+ip a show enp1s0f1np1 | grep inet
+```
+
+### node17
+node17で以下のコマンドを実行してください．
+```
+sudo tee /etc/netplan/41-cx7-sw.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f1np1:
+      addresses:
+        - 10.0.5.17/24
+      dhcp4: no
+EOF
+sudo chmod 600 /etc/netplan/41-cx7-sw.yaml
+sudo netplan apply
+ip a show enp1s0f1np1 | grep inet
+```
+
+### node18
+node18で以下のコマンドを実行してください．
+```
+sudo tee /etc/netplan/41-cx7-sw.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f1np1:
+      addresses:
+        - 10.0.5.18/24
+      dhcp4: no
+EOF
+sudo chmod 600 /etc/netplan/41-cx7-sw.yaml
+sudo netplan apply
+ip a show enp1s0f1np1 | grep inet
+```
+
+
+
+## Phase 4：接続テスト（ping）
+管理者nodeから以下のコマンドを実行してください．
+```
+ssh mprg@node15 "
+ping -c 3 10.0.5.16
+ping -c 3 10.0.5.17
+ping -c 3 10.0.5.18
+"
+```
+
+
+## Phase 5：/etc/hostsへの追記とSSH鍵交換
+### `/etc/hosts`への追記
+全てのnodeで`/etc/hosts`へ以下の内容を追記します．
+
+
+
+
 
 
 
