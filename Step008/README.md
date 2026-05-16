@@ -14,7 +14,8 @@ sudo sed -i '/node15-sw\|node16-sw\|node17-sw\|node18-sw/d' /etc/hosts
 
 
 ## 
-**[参考](https://build.nvidia.com/spark/multi-sparks-through-switch/multi-sparks)**
+**[参考](https://build.nvidia.com/spark/multi-sparks-through-switch/multi-sparks)** \
+
 node15
 ```
 # Create the netplan configuration file
