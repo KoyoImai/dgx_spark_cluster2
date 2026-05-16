@@ -110,10 +110,24 @@ sudo chmod 600 /etc/netplan/40-cx7.yaml
 
 # Apply the configuration
 sudo netplan apply
-
 ```
 
 
+
+## テストとワークロードの実行
+```
+# Set network interface environment variables (use your Up interface from the previous step)
+export UCX_NET_DEVICES=enp1s0f1np1
+export NCCL_SOCKET_IFNAME=enp1s0f1np1
+export OMPI_MCA_btl_tcp_if_include=enp1s0f1np1
+
+# Run the all_gather performance test across four nodes (replace the IP addresses with the ones you found in the previous step)
+mpirun -np 4 -H 192.168.100.10:1,192.168.100.12:1,192.168.100.14:1,192.168.100.16:1 \
+  --mca plm_rsh_agent "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" \
+  -x LD_LIBRARY_PATH=$LD_LIBRARY_PATH \
+  $HOME/nccl-tests/build/all_gather_perf
+
+```
 
 
 
