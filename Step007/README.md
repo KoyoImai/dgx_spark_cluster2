@@ -129,11 +129,27 @@ ping -c 3 10.0.5.18
 
 
 ## Phase 5：/etc/hostsへの追記とSSH鍵交換
+
 ### `/etc/hosts`への追記
 全てのnodeで`/etc/hosts`へ以下の内容を追記します．
+```
+sudo bash -c 'cat >> /etc/hosts << EOF
 
+# QSFP switch network (10.0.5.x)
+10.0.5.15   node15-sw
+10.0.5.16   node16-sw
+10.0.5.17   node17-sw
+10.0.5.18   node18-sw
+EOF'
+```
 
-
+### SSH鍵交換（計算node間）
+node15で以下のコマンドを実行してください．
+```
+ssh-copy-id mprg@10.0.5.16
+ssh-copy-id mprg@10.0.5.17
+ssh-copy-id mprg@10.0.5.18
+```
 
 
 
