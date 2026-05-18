@@ -163,3 +163,74 @@ sudo ethtool enP2p1s0f1np1 | grep -E "Speed|Link detected"
 mprg@spark-fb97:~/nccl-tests$ 
 ```
 
+## ip固定
+### node15
+```
+sudo ip addr add 192.168.100.15/24 dev enp1s0f1np1
+ip -br addr show dev enp1s0f1np1
+```
+
+## node16
+```
+sudo ip addr add 192.168.100.16/24 dev enp1s0f1np1
+ip -br addr show dev enp1s0f1np1
+```
+
+
+## node17
+```
+sudo ip addr add 192.168.100.17/24 dev enp1s0f1np1
+ip -br addr show dev enp1s0f1np1
+```
+
+
+## node18
+```
+sudo ip addr add 192.168.100.18/24 dev enp1s0f1np1
+ip -br addr show dev enp1s0f1np1
+```
+
+
+## 鍵共有
+node15で以下を実行
+```
+ssh-keygen -f ~/.ssh/known_hosts -R 192.168.100.16
+```
+
+
+## nccl-test
+```
+mprg@spark-fb97:~/nccl-tests$ cd ~/nccl-tests
+
+export CUDA_HOME="/usr/local/cuda"
+export MPI_HOME="/usr/lib/aarch64-linux-gnu/openmpi"
+export NCCL_HOME="$HOME/nccl/build"
+export LD_LIBRARY_PATH="$NCCL_HOME/lib:$CUDA_HOME/lib64:$MPI_HOME/lib:$LD_LIBRARY_PATH"
+
+mpirun -np 2 -H 192.168.100.15:1,192.168.100.16:1 \
+  --mca oob_tcp_if_include enp1s0f1np1 \
+  --mca btl_tcp_if_include enp1s0f1np1 \
+  -x LD_LIBRARY_PATH \
+  -x NCCL_SOCKET_IFNAME=enp1s0f1np1 \
+  ./build/all_gather_perf -b 1G -e 1G -f 2 -g 1
+# nccl-tests version 2.18.3 nccl-headers=22809 nccl-library=22809
+# Collective test starting: all_gather_perf
+# nThread 1 nGpus 1 minBytes 1073741824 maxBytes 1073741824 step: 2(factor) warmup iters: 1 iters: 20 agg iters: 1 validation: 1 graph: 0 unalign: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid 345949 on spark-fb97 device  0 [000f:01:00] NVIDIA GB10
+#  Rank  1 Group  0 Pid  74494 on spark-4440 device  0 [000f:01:00] NVIDIA GB10
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong 
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)         
+  1073741824     134217728     float    none      -1   191050    5.62    2.81       0   189841    5.66    2.83       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 2.81905 
+#
+# Collective test concluded: all_gather_perf
+#
+
+mprg@spark-fb97:~/nccl-tests$ 
+```
+明らかに速度が遅い．
