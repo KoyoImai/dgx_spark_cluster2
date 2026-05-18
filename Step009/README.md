@@ -73,6 +73,15 @@ sudo ip addr flush dev enP2p1s0f1np1
 ip -br addr show dev enP2p1s0f1np1
 ```
 
+もしくは以下のコマンドを全ての計算nodeで実行して永続的に削除．
+```
+sudo rm /etc/netplan/40-cx7.yaml
+sudo ip addr flush dev enp1s0f1np1
+sudo ip addr flush dev enP2p1s0f1np1
+ip -br addr show dev enp1s0f1np1
+ip -br addr show dev enP2p1s0f1np1
+```
+
 ## NCCLビルドのリセット
 ステップ101でビルドしたNCCLをリセットします．
 全てのnodeで`~/nccl`と`~/nccl-tests`を削除します．
