@@ -150,3 +150,16 @@ cd ~/nccl-tests/
 make MPI=1
 ```
 
+
+## リンク速度の確認
+以下のコマンドでリンク速度を確認する．
+```
+mprg@spark-fb97:~/nccl-tests$ sudo ethtool enp1s0f1np1 | grep -E "Speed|Link detected"
+sudo ethtool enP2p1s0f1np1 | grep -E "Speed|Link detected"
+	Speed: 200000Mb/s
+	Link detected: yes
+	Speed: 200000Mb/s
+	Link detected: yes
+mprg@spark-fb97:~/nccl-tests$ 
+```
+
