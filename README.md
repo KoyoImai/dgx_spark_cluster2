@@ -30,7 +30,7 @@
 
 **[ステップ007：QSFPの4台接続（QSFPスイッチ）-失敗（速度が遅い）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step007)**
 
-**[ステップ008：QSFPの4台接続（QSFPスイッチ）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step008)**
+**[ステップ008：QSFPの4台接続（QSFPスイッチ）-失敗（速度が遅い）](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step008)**
 
 ## LLMの学習＆推論
 
