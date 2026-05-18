@@ -24,7 +24,7 @@ sudo ip addr flush dev enP2p1s0f1np1
 ip -br addr show dev enP2p1s0f1np1
 ```
 
-## node16
+### node16
 以下のコマンドを実行してください．
 ```
 # enp1s0f1np1 のIP削除
@@ -40,24 +40,7 @@ sudo ip addr flush dev enP2p1s0f1np1
 ip -br addr show dev enP2p1s0f1np1
 ```
 
-## node17
-以下のコマンドを実行してください．
-```
-# enp1s0f1np1 のIP削除
-sudo ip addr flush dev enp1s0f1np1
-
-# 削除確認
-ip -br addr show dev enp1s0f1np1
-
-# enP2p1s0f1np1 のIP削除
-sudo ip addr flush dev enP2p1s0f1np1
-
-# 削除確認
-ip -br addr show dev enP2p1s0f1np1
-```
-
-
-## node18
+### node17
 以下のコマンドを実行してください．
 ```
 # enp1s0f1np1 のIP削除
@@ -74,4 +57,42 @@ ip -br addr show dev enP2p1s0f1np1
 ```
 
 
+### node18
+以下のコマンドを実行してください．
+```
+# enp1s0f1np1 のIP削除
+sudo ip addr flush dev enp1s0f1np1
 
+# 削除確認
+ip -br addr show dev enp1s0f1np1
+
+# enP2p1s0f1np1 のIP削除
+sudo ip addr flush dev enP2p1s0f1np1
+
+# 削除確認
+ip -br addr show dev enP2p1s0f1np1
+```
+
+## NCCLビルドのリセット
+ステップ101でビルドしたNCCLをリセットします．
+全てのnodeで`~/nccl`と`~/nccl-tests`を削除します．
+
+### node15
+```
+rm -rf ~/nccl ~/nccl-tests
+```
+
+### nod16
+```
+rm -rf ~/nccl ~/nccl-tests
+```
+
+### node17
+```
+rm -rf ~/nccl ~/nccl-tests
+```
+
+### node18
+```
+rm -rf ~/nccl ~/nccl-tests
+```
