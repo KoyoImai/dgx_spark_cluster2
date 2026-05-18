@@ -24,8 +24,40 @@ sudo ip addr flush dev enP2p1s0f1np1
 ip -br addr show dev enP2p1s0f1np1
 ```
 
-
 ## node16
+以下のコマンドを実行してください．
+```
+# enp1s0f1np1 のIP削除
+sudo ip addr flush dev enp1s0f1np1
+
+# 削除確認
+ip -br addr show dev enp1s0f1np1
+
+# enP2p1s0f1np1 のIP削除
+sudo ip addr flush dev enP2p1s0f1np1
+
+# 削除確認
+ip -br addr show dev enP2p1s0f1np1
+```
+
+## node17
+以下のコマンドを実行してください．
+```
+# enp1s0f1np1 のIP削除
+sudo ip addr flush dev enp1s0f1np1
+
+# 削除確認
+ip -br addr show dev enp1s0f1np1
+
+# enP2p1s0f1np1 のIP削除
+sudo ip addr flush dev enP2p1s0f1np1
+
+# 削除確認
+ip -br addr show dev enP2p1s0f1np1
+```
+
+
+## node18
 以下のコマンドを実行してください．
 ```
 # enp1s0f1np1 のIP削除
