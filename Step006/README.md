@@ -147,3 +147,6 @@ ssh-copy-id mprg@10.0.10.16
 ssh-copy-id mprg@10.0.10.17
 ssh-copy-id mprg@10.0.10.18
 ```
+
+**手順を記録し忘れたけど速度問題は修正済み**
+
