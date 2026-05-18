@@ -12,8 +12,10 @@
 ## 構成（予定）
 ・管理者node : DGX Spark 08 \
 ・計算用node : DGX Spark 15 ~ 18 \
-・管理者nodeと計算用nodeをRJ45 Ethernet スイッチ経由で接続 \
-・管理者nodeのみ研究室インターネットに接続しユーザーがログイン可能
+・管理者nodeと計算用nodeをRJ45 Ethernet スイッチ経由で接続 or 管理者nodeと計算用nodeをQSFPスイッチで接続（適宜切り替え）\
+・速度比較のためにDGX SparkをQSFPケーブルで直接接続する場合もあり \
+・管理者nodeのみ研究室インターネットに接続しユーザーがログイン可能 
+
 
 ## クラスタ構築
 **[ステップ001：ipアドレスの固定](https://github.com/KoyoImai/dgx_spark_cluster2/tree/main/Step001)**
