@@ -122,3 +122,22 @@ lrwxrwxrwx 1 mprg mprg       17  5月 18 13:04 /home/mprg/nccl/build/lib/libnccl
 -rwxrwxr-x 1 mprg mprg 50108144  5月 18 13:04 /home/mprg/nccl/build/lib/libnccl.so.2.28.9
 ```
 
+```
+# 環境変数の設定
+export CUDA_HOME="/usr/local/cuda"
+export MPI_HOME="/usr/lib/aarch64-linux-gnu/openmpi"
+export NCCL_HOME="$HOME/nccl/build"
+export LD_LIBRARY_PATH="$NCCL_HOME/lib:$CUDA_HOME/lib64:$MPI_HOME/lib:$LD_LIBRARY_PATH"
+```
+
+```
+# nccl-testのクローン
+git clone https://github.com/NVIDIA/nccl-tests.git ~/nccl-tests
+```
+
+```
+# nccl-testのビルド
+cd ~/nccl-tests/
+make MPI=1
+```
+
