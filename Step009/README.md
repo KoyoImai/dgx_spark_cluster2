@@ -101,7 +101,7 @@ rm -rf ~/nccl ~/nccl-tests
 ## NCCLの再ビルド
 NVIDIAの公式手順に従って，NCCLを再ビルドします．
 
-### node15
+### node15〜node18
 ```
 git clone -b v2.28.9-1 https://github.com/NVIDIA/nccl.git ~/nccl
 cd ~/nccl
