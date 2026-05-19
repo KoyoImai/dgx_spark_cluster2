@@ -438,3 +438,18 @@ bash /home4cluster/lora_train/step106/run_full_2node_qsfp_sw.sh
 
 ```
 
+### 
+```
+# 2node RJ45
+bash /home4cluster/lora_train/step106/run_full_2node_rj45.sh
+
+# 4node RJ45
+bash /home4cluster/lora_train/step106/run_full_4node_rj45.sh
+
+# 2node QSFPスイッチ
+bash /home4cluster/lora_train/step106/run_full_2node_qsfp_sw.sh
+
+# 4node QSFPスイッチ
+bash /home4cluster/lora_train/step106/run_full_4node_qsfp_sw.sh
+```
+
