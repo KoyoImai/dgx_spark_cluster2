@@ -370,6 +370,20 @@ avg_step_time: 0.461s/step
 ステップログ : /home4cluster/lora_train/logs/2node_rj45_20260519_061942_steps.csv
 サマリーログ : /home4cluster/lora_train/logs/results.csv
 ```
+```
+=== 結果 ===
+steps         : 500 (warmup: 5, measured: 495)
+avg_loss      : 0.3135
+elapsed       : 242.8s
+throughput    : 4.08 samples/sec
+avg_step_time : 0.474s/step
+  avg_forward : 0.204s  (43.0%)
+  avg_backward: 0.268s  (56.6%)
+  avg_optim   : 0.002s  (0.4%)
+
+ステップログ : /home4cluster/lora_train/logs/2node_rj45_20260519_110718_steps.csv
+サマリーログ : /home4cluster/lora_train/logs/results.csv                
+```
 
 
 ### 4node（RJ45）
