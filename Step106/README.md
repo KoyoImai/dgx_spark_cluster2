@@ -27,8 +27,11 @@ QSFPスイッチも含めて再計測を行います．
 | 1node      |  2.14 samples/sec |    465.4s     |     0.450s     |  1.00x  | 100%               |
 | 2node-RJ45 |  4.17 samples/sec |    237.2s     |     0.461s     |  x  | %                |
 | 2node-QSFP |  4.20 samples/sec |    235.9s     |     0.460s     |  x  | %                |
-| 4node-RJ45 |  samples/sec |    s     |     s     |  x  | %                |
+| 4node-RJ45 |  8.28 samples/sec |    118.3s     |     0.465s     |  x  | %                |
 | 4node-QSFP |  samples/sec |    s     |     s     |  x  | %                |
+
+
+
 
 
 ### 考察
@@ -339,6 +342,15 @@ avg_step_time: 0.461s/step
 bash /home4cluster/lora_train/step106/run_lora_4node_rj45.sh
 ```
 ```
+=== 結果 ===
+steps        : 250 (warmup: 5, measured: 245)
+avg_loss     : 0.3864
+elapsed      : 118.3s
+throughput   : 8.28 samples/sec
+avg_step_time: 0.465s/step
+
+ステップログ : /home4cluster/lora_train/logs/4node_rj45_20260519_065029_steps.csv
+サマリーログ : /home4cluster/lora_train/logs/results.csv
 ```
 
 
