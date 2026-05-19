@@ -322,12 +322,25 @@ avg_step_time: 0.450s/step
 bash /home4cluster/lora_train/step106/run_lora_2node_rj45.sh
 ```
 ```
+=== 結果 ===
+steps        : 500 (warmup: 5, measured: 495)
+avg_loss     : 0.3132
+elapsed      : 237.2s
+throughput   : 4.17 samples/sec
+avg_step_time: 0.461s/step
+
+ステップログ : /home4cluster/lora_train/logs/2node_rj45_20260519_061942_steps.csv
+サマリーログ : /home4cluster/lora_train/logs/results.csv
 ```
 
 
 
 ### 2node（QSFP）
-
+```
+bash /home4cluster/lora_train/step106/run_lora_2node_qsfp_sw.sh
+```
+```
+```
 
 
 
