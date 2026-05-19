@@ -446,6 +446,24 @@ avg_step_time: 11.087s/step
 サマリーログ : /home4cluster/lora_train/logs/results_full.csv
 ```
 
+
+
+### 4node（QSFPスイッチ）
+```
+bash /home4cluster/lora_train/step106/run_full_4node_qsfp_sw.sh
+```
+```
+=== 結果 ===
+steps        : 250 (warmup: 5, measured: 245)
+avg_loss     : 0.2090
+elapsed      : 3557.0s
+throughput   : 0.28 samples/sec
+avg_step_time: 14.501s/step
+
+ステップログ : /home4cluster/lora_train/logs/4node_qsfp_sw_full_20260519_093932_steps.csv
+サマリーログ : /home4cluster/lora_train/logs/results_full.csv
+```
+
 ### 
 ```
 # 2node RJ45
