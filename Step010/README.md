@@ -169,7 +169,7 @@ unset NCCL_IB_DISABLE
 
 
 
-markdown## ステップ10.4 NCCL Test 結果
+## ステップ10.4 NCCL Test 結果
 
 ### 実験設定
 
