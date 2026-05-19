@@ -428,3 +428,13 @@ avg_step_time: 2.289s/step
 ステップログ : /home4cluster/lora_train/logs/1node_none_full_20260519_070337_steps.csv
 サマリーログ : /home4cluster/lora_train/logs/results_full.csv
 ```
+
+
+### 2node（QSFPスイッチ）
+```
+bash /home4cluster/lora_train/step106/run_full_2node_qsfp_sw.sh
+```
+```
+
+```
+
