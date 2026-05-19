@@ -89,4 +89,27 @@ EOF'
 
 
 ## ステップ106.1：環境確認
+全ての計算nodeで以下を実行して環境を確認します．
+```
+# NCCLの確認
+ls -l ~/nccl/build/lib/libnccl.so*
+
+# 3系統のネットワーク確認
+ip a show enP7s7       | grep inet  # RJ45
+ip a show enp1s0f0np0  | grep inet  # QSFP直結
+ip a show enp1s0f1np1  | grep inet  # QSFPスイッチ
+```
+
+
+## ステップ106.2：学習スクリプトの用意
+学習プログラムは，すでに作成済みの`/home4cluster/lora_train/train_alpaca.py`を使用します．
+起動スクリプトは全て`/home4cluster/lora_train/step106/`ディレクトリに配置します．
+以下のコマンドを管理者nodeで実行して起動スクリプトを作成してください．
+
+
+
+
+
+
+
 
