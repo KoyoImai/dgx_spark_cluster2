@@ -2,6 +2,39 @@
 QSFPスイッチも含めて再計測を行います．
 ステップ6〜8でQSFP直結の設定を削除してしまっているので，それらの復元などもここで行います．
 
+## LoRAチューニング学習速度比較結果
+### 実験設定
+
+| 項目 | 値 |
+|------|-----|
+| モデル | Qwen2.5-7B-Instruct |
+| データセット | tatsu-lab/alpaca（1,000件） |
+| シーケンス長 | 512トークン |
+| バッチサイズ | 1 |
+| LoRA rank (r) | 8 |
+| LoRA alpha | 16 |
+| 対象モジュール | q_proj, v_proj |
+| 学習可能パラメータ | 2,523,136（全体の0.033%） |
+| ウォームアップステップ | 5 |
+| seed | 42 |
+| フレームワーク | PyTorch DDP + PEFT |
+| Dockerイメージ | nvcr.io/nvidia/pytorch:25.05-py3 |
+
+### 結果
+
+|     構成    |    throughput    |    elapsed    | avg_step_time  | speedup | scaling efficiency |
+|------------|------------------|---------------|----------------|---------|--------------------|
+| 1node      |  2.14 samples/sec |    465.4s     |     0.450s     |  1.00x  | 100%               |
+| 2node-RJ45 |  samples/sec |    s     |     s     |  x  | %                |
+| 2node-QSFP |  samples/sec |    s     |     s     |  x  | %                |
+| 4node-RJ45 |  samples/sec |    s     |     s     |  x  | %                |
+| 4node-QSFP |  samples/sec |    s     |     s     |  x  | %                |
+
+
+### 考察
+
+
+
 ## 前準備
 ### `40-cx7.yaml`の作成
 QSFPケーブルでDGX Sparkを直接接続するために，`40-cx7.yaml`を再作成します．
@@ -105,8 +138,184 @@ ip a show enp1s0f1np1  | grep inet  # QSFPスイッチ
 学習プログラムは，すでに作成済みの`/home4cluster/lora_train/train_alpaca.py`を使用します．
 起動スクリプトは全て`/home4cluster/lora_train/step106/`ディレクトリに配置します．
 以下のコマンドを管理者nodeで実行して起動スクリプトを作成してください．
+```
+# LoRA用スクリプト
+# ── 1node ──────────────────────────────────────────────────────
+cat > /home4cluster/lora_train/step106/run_lora_1node.sh << 'EOF'
+#!/bin/bash
+ssh mprg@node15 "docker run --rm --gpus all --network host \
+    --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+    -v /home4cluster:/home4cluster \
+    -v /home/mprg/nccl/build:/home/mprg/nccl/build \
+    -e LD_PRELOAD=/home/mprg/nccl/build/lib/libnccl.so \
+    -e NCCL_SOCKET_IFNAME=enP7s7 \
+    -e NCCL_IB_DISABLE=1 \
+    -e NCCL_NET=Socket \
+    -e CONNECT_TYPE=none \
+    nvcr.io/nvidia/pytorch:25.05-py3 \
+    bash -c 'pip install -q peft transformers datasets && torchrun \
+        --nnodes=1 --nproc_per_node=1 \
+        --master_addr=localhost --master_port=29500 \
+        /home4cluster/lora_train/train_alpaca.py'"
+EOF
 
+# ── 2node RJ45 ─────────────────────────────────────────────────
+cat > /home4cluster/lora_train/step106/run_lora_2node_rj45.sh << 'EOF'
+#!/bin/bash
+MASTER_ADDR="10.0.0.15"; MASTER_PORT="29500"; NNODES=2
+NODES=("node15" "node16")
+for i in "${!NODES[@]}"; do
+    NODE=${NODES[$i]}; RANK=$i
+    ssh mprg@$NODE "docker run --rm --gpus all --network host \
+        --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+        -v /home4cluster:/home4cluster \
+        -v /home/mprg/nccl/build:/home/mprg/nccl/build \
+        -e LD_PRELOAD=/home/mprg/nccl/build/lib/libnccl.so \
+        -e NCCL_SOCKET_IFNAME=enP7s7 \
+        -e NCCL_IB_DISABLE=1 \
+        -e NCCL_NET=Socket \
+        -e CONNECT_TYPE=rj45 \
+        nvcr.io/nvidia/pytorch:25.05-py3 \
+        bash -c 'pip install -q peft transformers datasets && torchrun \
+            --nnodes=$NNODES --nproc_per_node=1 \
+            --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT \
+            --node_rank=$RANK \
+            /home4cluster/lora_train/train_alpaca.py'" &
+done; wait
+EOF
 
+# ── 2node QSFP直結 ─────────────────────────────────────────────
+cat > /home4cluster/lora_train/step106/run_lora_2node_qsfp.sh << 'EOF'
+#!/bin/bash
+MASTER_ADDR="10.0.1.1"; MASTER_PORT="29500"; NNODES=2
+NODES=("node15-qsfp" "node16-qsfp")
+for i in "${!NODES[@]}"; do
+    NODE=${NODES[$i]}; RANK=$i
+    ssh mprg@$NODE "docker run --rm --gpus all --network host \
+        --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+        -v /home4cluster:/home4cluster \
+        -v /home/mprg/nccl/build:/home/mprg/nccl/build \
+        -e LD_PRELOAD=/home/mprg/nccl/build/lib/libnccl.so \
+        -e NCCL_SOCKET_IFNAME=enp1s0f0np0 \
+        -e NCCL_IB_DISABLE=0 \
+        -e NCCL_IB_HCA=rocep1s0f0 \
+        -e CONNECT_TYPE=qsfp \
+        nvcr.io/nvidia/pytorch:25.05-py3 \
+        bash -c 'pip install -q peft transformers datasets && torchrun \
+            --nnodes=$NNODES --nproc_per_node=1 \
+            --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT \
+            --node_rank=$RANK \
+            /home4cluster/lora_train/train_alpaca.py'" &
+done; wait
+EOF
+
+# ── 2node QSFPスイッチ ─────────────────────────────────────────
+cat > /home4cluster/lora_train/step106/run_lora_2node_qsfp_sw.sh << 'EOF'
+#!/bin/bash
+MASTER_ADDR="192.168.100.15"; MASTER_PORT="29500"; NNODES=2
+NODES=("node15-sw" "node16-sw")
+for i in "${!NODES[@]}"; do
+    NODE=${NODES[$i]}; RANK=$i
+    ssh mprg@$NODE "docker run --rm --gpus all --network host \
+        --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+        -v /home4cluster:/home4cluster \
+        -v /home/mprg/nccl/build:/home/mprg/nccl/build \
+        -e LD_PRELOAD=/home/mprg/nccl/build/lib/libnccl.so \
+        -e NCCL_SOCKET_IFNAME=enp1s0f1np1 \
+        -e NCCL_IB_DISABLE=0 \
+        -e NCCL_IB_HCA=rocep1s0f1 \
+        -e CONNECT_TYPE=qsfp_sw \
+        nvcr.io/nvidia/pytorch:25.05-py3 \
+        bash -c 'pip install -q peft transformers datasets && torchrun \
+            --nnodes=$NNODES --nproc_per_node=1 \
+            --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT \
+            --node_rank=$RANK \
+            /home4cluster/lora_train/train_alpaca.py'" &
+done; wait
+EOF
+
+# ── 4node RJ45 ─────────────────────────────────────────────────
+cat > /home4cluster/lora_train/step106/run_lora_4node_rj45.sh << 'EOF'
+#!/bin/bash
+MASTER_ADDR="10.0.0.15"; MASTER_PORT="29500"; NNODES=4
+NODES=("node15" "node16" "node17" "node18")
+for i in "${!NODES[@]}"; do
+    NODE=${NODES[$i]}; RANK=$i
+    ssh mprg@$NODE "docker run --rm --gpus all --network host \
+        --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+        -v /home4cluster:/home4cluster \
+        -v /home/mprg/nccl/build:/home/mprg/nccl/build \
+        -e LD_PRELOAD=/home/mprg/nccl/build/lib/libnccl.so \
+        -e NCCL_SOCKET_IFNAME=enP7s7 \
+        -e NCCL_IB_DISABLE=1 \
+        -e NCCL_NET=Socket \
+        -e CONNECT_TYPE=rj45 \
+        nvcr.io/nvidia/pytorch:25.05-py3 \
+        bash -c 'pip install -q peft transformers datasets && torchrun \
+            --nnodes=$NNODES --nproc_per_node=1 \
+            --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT \
+            --node_rank=$RANK \
+            /home4cluster/lora_train/train_alpaca.py'" &
+done; wait
+EOF
+
+# ── 4node QSFPスイッチ ─────────────────────────────────────────
+cat > /home4cluster/lora_train/step106/run_lora_4node_qsfp_sw.sh << 'EOF'
+#!/bin/bash
+MASTER_ADDR="192.168.100.15"; MASTER_PORT="29500"; NNODES=4
+NODES=("node15-sw" "node16-sw" "node17-sw" "node18-sw")
+for i in "${!NODES[@]}"; do
+    NODE=${NODES[$i]}; RANK=$i
+    ssh mprg@$NODE "docker run --rm --gpus all --network host \
+        --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+        -v /home4cluster:/home4cluster \
+        -v /home/mprg/nccl/build:/home/mprg/nccl/build \
+        -e LD_PRELOAD=/home/mprg/nccl/build/lib/libnccl.so \
+        -e NCCL_SOCKET_IFNAME=enp1s0f1np1 \
+        -e NCCL_IB_DISABLE=0 \
+        -e NCCL_IB_HCA=rocep1s0f1 \
+        -e CONNECT_TYPE=qsfp_sw \
+        nvcr.io/nvidia/pytorch:25.05-py3 \
+        bash -c 'pip install -q peft transformers datasets && torchrun \
+            --nnodes=$NNODES --nproc_per_node=1 \
+            --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT \
+            --node_rank=$RANK \
+            /home4cluster/lora_train/train_alpaca.py'" &
+done; wait
+EOF
+
+chmod +x /home4cluster/lora_train/step106/run_lora_*.sh
+echo "LoRA起動スクリプト生成完了"
+```
+
+```
+# フルFT用スクリプト
+for conf in 1node 2node_rj45 2node_qsfp 2node_qsfp_sw 4node_rj45 4node_qsfp_sw; do
+    sed "s/train_alpaca\.py/train_alpaca_full.py/g; s/run_lora/run_full/g" \
+        /home4cluster/lora_train/step106/run_lora_${conf}.sh \
+        > /home4cluster/lora_train/step106/run_full_${conf}.sh
+    chmod +x /home4cluster/lora_train/step106/run_full_${conf}.sh
+done
+echo "フルFT起動スクリプト生成完了"
+```
+
+## ステップ106.3：LoRA学習の実行
+
+### 1node
+```
+bash /home4cluster/lora_train/step106/run_lora_1node.sh
+```
+```
+=== 結果 ===
+steps        : 1000 (warmup: 5, measured: 995)
+avg_loss     : 0.2934
+elapsed      : 465.4s
+throughput   : 2.14 samples/sec
+avg_step_time: 0.450s/step
+
+ステップログ : /home4cluster/lora_train/logs/1node_none_20260519_060443_steps.csv
+サマリーログ : /home4cluster/lora_train/logs/results.csv
+```
 
 
 
