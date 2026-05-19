@@ -359,5 +359,11 @@ avg_step_time: 0.460s/step
 ```
 
 
+### 4node（QSFPスイッチ）
+```
+bash /home4cluster/lora_train/step106/run_lora_4node_qsfp_sw.sh
+```
+```
+```
 
 
