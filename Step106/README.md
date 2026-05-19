@@ -317,6 +317,16 @@ avg_step_time: 0.450s/step
 サマリーログ : /home4cluster/lora_train/logs/results.csv
 ```
 
+### 2node（RJ45）
+```
+bash /home4cluster/lora_train/step106/run_lora_2node_rj45.sh
+```
+```
+```
+
+
+
+### 2node（QSFP）
 
 
 
