@@ -55,7 +55,7 @@ QSFPスイッチも含めて再計測を行います．
 |------------|------------------|---------------|----------------|---------|--------------------|
 | 1node      |   0.43 samples/sec |    2294.8s     |     2.289s     |  1.00x  | 100%               |
 | 2node-RJ45 |   samples/sec |    s     |     s     |  x  | %                |
-| 2node-QSFP |   samples/sec |    s     |     s     |  x  | %                |
+| 2node-QSFP |   0.18 samples/sec |    5496.6s     |     11.087s     |  x  | %                |
 | 4node-RJ45 |   samples/sec |    s     |     s     |  x  | %                |
 | 4node-QSFP |   samples/sec |    s     |     s     |  x  | %                |
 
@@ -435,7 +435,15 @@ avg_step_time: 2.289s/step
 bash /home4cluster/lora_train/step106/run_full_2node_qsfp_sw.sh
 ```
 ```
+=== 結果 ===
+steps        : 500 (warmup: 5, measured: 495)
+avg_loss     : 0.1999
+elapsed      : 5496.6s
+throughput   : 0.18 samples/sec
+avg_step_time: 11.087s/step
 
+ステップログ : /home4cluster/lora_train/logs/2node_qsfp_sw_full_20260519_080326_steps.csv
+サマリーログ : /home4cluster/lora_train/logs/results_full.csv
 ```
 
 ### 
