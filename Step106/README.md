@@ -53,7 +53,7 @@ QSFPスイッチも含めて再計測を行います．
 
 |     構成    |    throughput    |    elapsed    | avg_step_time  | speedup | scaling efficiency |
 |------------|------------------|---------------|----------------|---------|--------------------|
-| 1node      |   samples/sec |    s     |     s     |  1.00x  | 100%               |
+| 1node      |   0.43 samples/sec |    2294.8s     |     2.289s     |  1.00x  | 100%               |
 | 2node-RJ45 |   samples/sec |    s     |     s     |  x  | %                |
 | 2node-QSFP |   samples/sec |    s     |     s     |  x  | %                |
 | 4node-RJ45 |   samples/sec |    s     |     s     |  x  | %                |
@@ -411,4 +411,20 @@ avg_step_time: 0.466s/step
 サマリーログ : /home4cluster/lora_train/logs/results.csv
 ```
 
+## ステップ106.4：フルFTの学習
 
+### 1node
+```
+bash /home4cluster/lora_train/step106/run_full_1node.sh
+```
+```
+=== 結果 ===
+steps        : 1000 (warmup: 5, measured: 995)
+avg_loss     : 0.2067
+elapsed      : 2294.8s
+throughput   : 0.43 samples/sec
+avg_step_time: 2.289s/step
+
+ステップログ : /home4cluster/lora_train/logs/1node_none_full_20260519_070337_steps.csv
+サマリーログ : /home4cluster/lora_train/logs/results_full.csv
+```
