@@ -31,10 +31,37 @@ QSFPスイッチも含めて再計測を行います．
 | 4node-QSFP |  8.29 samples/sec |    118.2s     |     0.466s     |  x  | %                |
 
 
-
-
-
 ### 考察
+
+
+## フルFT学習速度比較結果
+### 実験設定
+
+| 項目 | 値 |
+|------|-----|
+| モデル | Qwen2.5-7B-Instruct |
+| データセット | tatsu-lab/alpaca（1,000件） |
+| シーケンス長 | 512トークン |
+| バッチサイズ | 1 |
+| LoRA rank (r) | 8 |
+| LoRA alpha | 16 |
+| 対象モジュール | q_proj, v_proj |
+| 学習可能パラメータ | 2,523,136（全体の0.033%） |
+| ウォームアップステップ | 5 |
+| seed | 42 |
+| フレームワーク | PyTorch DDP + PEFT |
+| Dockerイメージ | nvcr.io/nvidia/pytorch:25.05-py3 |
+
+### 結果
+
+|     構成    |    throughput    |    elapsed    | avg_step_time  | speedup | scaling efficiency |
+|------------|------------------|---------------|----------------|---------|--------------------|
+| 1node      |  2.14 samples/sec |    465.4s     |     0.450s     |  1.00x  | 100%               |
+| 2node-RJ45 |  4.17 samples/sec |    237.2s     |     0.461s     |  x  | %                |
+| 2node-QSFP |  4.20 samples/sec |    235.9s     |     0.460s     |  x  | %                |
+| 4node-RJ45 |  8.28 samples/sec |    118.3s     |     0.465s     |  x  | %                |
+| 4node-QSFP |  8.29 samples/sec |    118.2s     |     0.466s     |  x  | %                |
+
 
 
 
