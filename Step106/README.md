@@ -343,6 +343,17 @@ avg_step_time: 0.450s/step
 ステップログ : /home4cluster/lora_train/logs/1node_none_20260519_060443_steps.csv
 サマリーログ : /home4cluster/lora_train/logs/results.csv
 ```
+```
+=== 結果 ===
+steps         : 1000 (warmup: 5, measured: 995)
+avg_loss      : 0.2811
+elapsed       : 474.3s
+throughput    : 2.10 samples/sec
+avg_step_time : 0.459s/step
+  avg_forward : 0.205s  (44.7%)
+  avg_backward: 0.252s  (54.9%)
+  avg_optim   : 0.002s  (0.4%)
+```
 
 ### 2node（RJ45）
 ```
