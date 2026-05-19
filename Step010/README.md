@@ -9,6 +9,7 @@ DGX Spark自体を再起動すれば速度は正常に戻るが，その後QSFP�
 
 ## ステップ10.1：IPアドレスの永続化
 ステップ9では各nodeのIPアドレスを手動で固定していましたが，再起動のたびにリセットされるので永続化をします．
+ここでは，QSFPスイッチを用いた接続でのIPアドレス固定を行います．
 各計算nodeで以下のコマンドを実行してください．
 ```
 # node15
@@ -112,5 +113,57 @@ done
 
 
 ## ステップ10.4：NCCL Testの実行
+NCCL Testによる通信速度のテストを行います．
+まず，以下のコマンドを全てのnodeで実行して環境変数を設定してください．
+```
+export CUDA_HOME="/usr/local/cuda"
+export MPI_HOME="/usr/lib/aarch64-linux-gnu/openmpi"
+export NCCL_HOME="$HOME/nccl/build"
+export LD_LIBRARY_PATH="$NCCL_HOME/lib:$CUDA_HOME/lib64:$MPI_HOME/lib:$LD_LIBRARY_PATH"
+```
 
+### テスト1：2台（QSFPスイッチ）
+node15で以下のコマンドを実行してください．
+```
+cd ~/nccl-tests
+
+mpirun -np 2 \
+  -H 192.168.100.15:1,192.168.100.16:1 \
+  --mca oob_tcp_if_include enp1s0f1np1 \
+  --mca btl_tcp_if_include enp1s0f1np1 \
+  -x LD_LIBRARY_PATH \
+  -x NCCL_SOCKET_IFNAME=enp1s0f1np1 \
+  ./build/all_gather_perf -b 1G -e 4G -f 2 -n 50 -w 10 -g 1
+```
+
+
+### テスト2：4台（QSFPスイッチ）
+node15で以下のコマンドを実行してください．
+```
+mpirun -np 4 \
+  -H 192.168.100.15:1,192.168.100.16:1,192.168.100.17:1,192.168.100.18:1 \
+  --mca oob_tcp_if_include enp1s0f1np1 \
+  --mca btl_tcp_if_include enp1s0f1np1 \
+  -x LD_LIBRARY_PATH \
+  -x NCCL_SOCKET_IFNAME=enp1s0f1np1 \
+  ./build/all_gather_perf -b 1G -e 4G -f 2 -n 50 -w 10 -g 1
+```
+
+
+### テスト3：4台（RJ45）
+node15で以下のコマンドを実行してください．
+```
+export NCCL_IB_DISABLE=1
+
+mpirun -np 4 \
+  -H 10.0.0.15:1,10.0.0.16:1,10.0.0.17:1,10.0.0.18:1 \
+  --mca oob_tcp_if_include enP7s7 \
+  --mca btl_tcp_if_include enP7s7 \
+  -x LD_LIBRARY_PATH \
+  -x NCCL_SOCKET_IFNAME=enP7s7 \
+  -x NCCL_IB_DISABLE \
+  ./build/all_gather_perf -b 1G -e 4G -f 2 -n 50 -w 10 -g 1
+
+unset NCCL_IB_DISABLE
+```
 
