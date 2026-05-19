@@ -25,7 +25,7 @@ QSFPスイッチも含めて再計測を行います．
 |     構成    |    throughput    |    elapsed    | avg_step_time  | speedup | scaling efficiency |
 |------------|------------------|---------------|----------------|---------|--------------------|
 | 1node      |  2.14 samples/sec |    465.4s     |     0.450s     |  1.00x  | 100%               |
-| 2node-RJ45 |  samples/sec |    s     |     s     |  x  | %                |
+| 2node-RJ45 |  4.17 samples/sec |    237.2s     |     0.461s     |  x  | %                |
 | 2node-QSFP |  samples/sec |    s     |     s     |  x  | %                |
 | 4node-RJ45 |  samples/sec |    s     |     s     |  x  | %                |
 | 4node-QSFP |  samples/sec |    s     |     s     |  x  | %                |
