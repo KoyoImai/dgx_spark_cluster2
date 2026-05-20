@@ -46,6 +46,7 @@ DGX Sparkは，Grace CPUとBlackwell GPUを統合した，CPU-GPU統合メモリ
 NVIDIA GB10 Grace Blackwellとは，ArmベースのGrace CPUとBlackwell GPUを1つのモジュールに統合したプロセッサです．
 DGX Sparkは，NVIDIA GB10 Grace Blackwellを採用しており，128GBの共有メモリを持っています．
 共有メモリの内部では，NVLink-C2CによってGrace CPUとBlackwell GPUの接続が行われています．
+System of Chip(SoC)と表記する場合もある．
 
 ### LPDDR5x coherent unified system memory
 LPDDR5x coherent unified system memoryとは，CPUとGPUがデータコピーのオーバーヘッドなしに単一の広大なメモリ空間を共有できる技術です．
