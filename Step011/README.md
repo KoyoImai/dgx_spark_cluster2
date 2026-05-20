@@ -61,7 +61,7 @@ LPDDR5x coherent unified system memoryとは，CPUとGPUがデータコピーの
 
 ## 起きている現象
 QSFPスイッチ，もしくはQSFPケーブルで直接接続したDGX Spark複数台でnccl-testを行う際，通信速度が低下する現象が発生する．
-現状判明していることは以下の通りで．
+現状判明していることは以下の通り．
 
 - DGX Sparkを再起動した直後は，QSFPスイッチやQSFPケーブル直接接続のどちらでも妥当な通信速度を達成する（20GBps〜22GBps程度）．
 - QSFP接続の方式を変更すると，nccl-testの通信速度が低下する．約2.8Gbps〜3.2GBps程度で，RJ45の1.25GBpsよりは速いが，QSFPの理論値25GBpsよりも限りなく低速になる．
