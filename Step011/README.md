@@ -115,4 +115,18 @@ mprg@spark-fb97:~/nccl-tests$
 
 ### 1.3：結果の確認
 1.2のQSFPケーブル直結への切り替えで，nccl-testの通信速度が低下していることがわかります．
+具体的には，`Avg bus bandwidth : 21.4033`が`Avg bus bandwidth : 2.82151`まで低下します．
+またこの時，Active FEC encodingが`RS`から`None`へと変化していることも確認できます．
 
+
+### 1.4：Active FEC encodingが原因なのかを調査
+```
+mprg@spark-fb97:~/nccl-tests$ sudo ethtool --set-fec enp1s0f0np0 encoding rs
+mprg@spark-fb97:~/nccl-tests$ sudo ethtool --show-fec enp1s0f0np0
+FEC parameters for enp1s0f0np0:
+Supported/Configured FEC encodings: RS
+Active FEC encoding: RS
+```
+```
+
+```
