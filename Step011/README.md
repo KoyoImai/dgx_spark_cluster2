@@ -751,8 +751,17 @@ spark-4440:24302:24302 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefau
 spark-fb97:23491:23491 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
 mprg@spark-fb97:~/nccl-tests$ 
 </code></pre>
-
 </details>
+
+
+
+
+
+
+
+
+
+
 
 <details>
 <summary>QSFP直結に切り替えてnccl-testを実行</summary>
@@ -1182,6 +1191,24 @@ spark-4440:25264:25264 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefau
 spark-fb97:23940:23940 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
 mprg@spark-fb97:~/nccl-tests$ 
 </code></pre>
-
 </details>
 
+
+
+### 1.10：結果の解釈
+1.9の結果を見る限り，TCPソケット通信をしているわけではなく，RDMA通信を行なっているようです．
+まず，低速化後のログでも，NCCLはRoCEデバイスを認識しています．
+```
+spark-fb97:23940:23940 [0] NCCL INFO NET/IB: [0] rocep1s0f0:uverbs0:1/RoCE provider=Mlx5 speed=200000 context=0xc1abd84b7eb0 pciPath=/sys/devices/pci0000:00/0000:00:00.0/0000:01:00.0 ar=0
+spark-4440:25264:25264 [0] NCCL INFO NET/IB: [0] rocep1s0f0:uverbs0:1/RoCE provider=Mlx5 speed=200000 context=0xad6cd9442240 pciPath=/sys/devices/pci0000:00/0000:00:00.0/0000:01:00.0 ar=0
+spark-fb97:23940:23940 [0] NCCL INFO NET/IB: [2] roceP2p1s0f0:uverbs2:1/RoCE provider=Mlx5 speed=200000 context=0xc1abd84f95b0 pciPath=/sys/devices/pci0002:00/0002:00:00.0/0002:01:00.0 ar=0
+spark-4440:25264:25264 [0] NCCL INFO NET/IB: [2] roceP2p1s0f0:uverbs2:1/RoCE provider=Mlx5 speed=200000 context=0xad6cd9483940 pciPath=/sys/devices/pci0002:00/0002:00:00.0/0002:01:00.0 ar=0
+```
+また，低速化後でも`NET/IB`トランスポートを使用しています．
+```
+spark-fb97:23940:23940 [0] NCCL INFO NET/IB : Using [0]rocep1s0f0:1/RoCE [1]roceP2p1s0f0:1/RoCE [RO]; OOB enp1s0f0np0:10.0.1.1<0>
+spark-fb97:23940:23940 [0] NCCL INFO Using network IB
+spark-4440:25264:25264 [0] NCCL INFO NET/IB : Using [0]rocep1s0f0:1/RoCE [1]roceP2p1s0f0:1/RoCE [RO]; OOB enp1s0f0np0:10.0.1.2<0>
+spark-4440:25264:25264 [0] NCCL INFO Using network IB
+```
+上記の結果から，RoCE / RDMA系transportを使っているにもかかわらず，速度が 20〜22 GB/s ではなく 2.8 GB/s 程度に落ちていることがわかります．
