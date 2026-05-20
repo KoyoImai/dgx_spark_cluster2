@@ -326,8 +326,10 @@ Active FEC encoding: RS
 
 
 ### 1.9：TCPソケット通信になっている可能性の調査
-再起動直後のQSFPスイッチ経由通信でのnccl-test
-```
+<details>
+<summary>再起動直後のQSFPスイッチ経由通信でのnccl-test</summary>
+
+<pre><code>
 mprg@spark-fb97:~/nccl-tests$ DISPLAY= \
 mpirun -np 2 \
   -H 192.168.100.15:1,192.168.100.16:1 \
@@ -748,22 +750,13 @@ spark-4440:24302:24302 [0] NCCL INFO comm 0xc53b8f7f6ab0 rank 1 nranks 2 cudaDev
 spark-4440:24302:24302 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
 spark-fb97:23491:23491 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
 mprg@spark-fb97:~/nccl-tests$ 
-```
+</code></pre>
 
-QSFP直結に切り替えてnccl-testを実行．
-```
-DISPLAY= \
-mpirun -np 2 \
-  -H 10.0.1.1:1,10.0.1.2:1 \
-  --mca oob_tcp_if_include enp1s0f0np0 \
-  --mca btl_tcp_if_include enp1s0f0np0 \
-  -x LD_LIBRARY_PATH \
-  -x NCCL_SOCKET_IFNAME=enp1s0f0np0 \
-  -x NCCL_DEBUG=INFO \
-  -x NCCL_DEBUG_SUBSYS=INIT,NET \
-  ./build/all_gather_perf -b 1G -e 4G -f 2 -n 5 -w 2 -g 1
-```
-```
+</details>
+
+<details>
+<summary>QSFP直結に切り替えてnccl-testを実行</summary>
+<pre><code>
 mprg@spark-fb97:~/nccl-tests$ DISPLAY= \
 mpirun -np 2 \
   -H 10.0.1.1:1,10.0.1.2:1 \
@@ -1188,5 +1181,7 @@ spark-4440:25264:25264 [0] NCCL INFO comm 0xad6cd7e86360 rank 1 nranks 2 cudaDev
 spark-4440:25264:25264 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
 spark-fb97:23940:23940 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
 mprg@spark-fb97:~/nccl-tests$ 
-```
+</code></pre>
+
+</details>
 
