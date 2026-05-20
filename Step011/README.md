@@ -127,6 +127,7 @@ mprg@spark-fb97:~/nccl-tests$
 
 
 ### 1.4：Active FEC encodingが原因なのかを調査
+Active FEC encodingを`RS`へと変更する．
 ```
 mprg@spark-fb97:~/nccl-tests$ sudo ethtool --set-fec enp1s0f0np0 encoding rs
 mprg@spark-fb97:~/nccl-tests$ sudo ethtool --show-fec enp1s0f0np0
@@ -134,6 +135,7 @@ FEC parameters for enp1s0f0np0:
 Supported/Configured FEC encodings: RS
 Active FEC encoding: RS
 ```
+Active FEC encodingを`RS`へと変更し，再度nccl-testを実行する．
 ```
 mprg@spark-fb97:~/nccl-tests$ cd ~/nccl-tests
 mpirun -np 2 \
@@ -177,3 +179,13 @@ Authorization required, but no authorization protocol specified
 
 mprg@spark-fb97:~/nccl-tests$ 
 ```
+
+### 1.5：結果の確認
+FECをRS-FECに変更しても速度が変わらないため，FECは根本原因ではない可能性が高いです．
+次の可能性として，RDMAを考える．
+RDMAは，CPUやOSを介さずにメモリ間で直接データをやりとりする技術です．
+可能性として，QSFPケーブルを差し替えた際に，なんらかの理由でRDMAが使用されず，代わりにSocket通信でCPUやOSを介した通信となってしまっているため，速度が低下している？
+
+
+
+
