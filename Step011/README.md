@@ -317,9 +317,437 @@ Active FEC encoding: RS
 - QSFPケーブルでの接続方法を変更すると，接続方法によらず通信速度が低下する．
 - QSFpケーブルの接続方法を再起動時と同じ状態にしても通信速度は戻らず，再起動するまで低速な状態が続く．
 
-上記の事実から，現在考えられる仮説
+上記の事実から，考えられる仮説
+- 通信速度は低下しても，2.8GBps〜3.2GBps程度は出ていることから，RJ45（理論値1.25GBps）で通信してしまっている可能性は低い
 - 通信速度の低下の直接的なトリガーは，QSFPケーブル差し替えによる物理リンクの切断
 
+
+
+
+### 1.9：TCPソケット通信になっている可能性の調査
+再起動直後のQSFPスイッチ経由通信でのnccl-test
+```
+mprg@spark-fb97:~/nccl-tests$ DISPLAY= \
+mpirun -np 2 \
+  -H 192.168.100.15:1,192.168.100.16:1 \
+  --mca oob_tcp_if_include enp1s0f1np1 \
+  --mca btl_tcp_if_include enp1s0f1np1 \
+  -x LD_LIBRARY_PATH \
+  -x NCCL_SOCKET_IFNAME=enp1s0f1np1 \
+  -x NCCL_DEBUG=INFO \
+  -x NCCL_DEBUG_SUBSYS=INIT,NET \
+  ./build/all_gather_perf -b 1G -e 1G -f 2 -n 1 -w 1 -g 1
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+# nccl-tests version 2.18.3 nccl-headers=22809 nccl-library=22809
+# Collective test starting: all_gather_perf
+# nThread 1 nGpus 1 minBytes 1073741824 maxBytes 1073741824 step: 2(factor) warmup iters: 1 iters: 1 agg iters: 1 validation: 1 graph: 0 unalign: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid  23491 on spark-fb97 device  0 [000f:01:00] NVIDIA GB10
+#  Rank  1 Group  0 Pid  24302 on spark-4440 device  0 [000f:01:00] NVIDIA GB10
+spark-fb97:23491:23491 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+spark-fb97:23491:23491 [0] NCCL INFO NCCL_SOCKET_IFNAME set to enp1s0f1np1
+spark-fb97:23491:23491 [0] NCCL INFO cudaDriverVersion 13000
+spark-fb97:23491:23491 [0] NCCL INFO NCCL version 2.28.9+cuda13.0
+spark-4440:24302:24302 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+spark-4440:24302:24302 [0] NCCL INFO cudaDriverVersion 13000
+spark-4440:24302:24302 [0] NCCL INFO NCCL_SOCKET_IFNAME set to enp1s0f1np1
+spark-4440:24302:24302 [0] NCCL INFO NCCL version 2.28.9+cuda13.0
+spark-4440:24302:24302 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+spark-4440:24302:24302 [0] NCCL INFO dlvsym failed on mlx5dv_get_data_direct_sysfs_path - /lib/aarch64-linux-gnu/libmlx5.so: undefined symbol: mlx5dv_get_data_direct_sysfs_path, version MLX5_1.25 version MLX5_1.25
+spark-4440:24302:24302 [0] NCCL INFO dlvsym failed on mlx5dv_reg_dmabuf_mr - /lib/aarch64-linux-gnu/libmlx5.so: undefined symbol: mlx5dv_reg_dmabuf_mr, version MLX5_1.25 version MLX5_1.25
+spark-fb97:23491:23491 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+spark-fb97:23491:23491 [0] NCCL INFO dlvsym failed on mlx5dv_get_data_direct_sysfs_path - /lib/aarch64-linux-gnu/libmlx5.so: undefined symbol: mlx5dv_get_data_direct_sysfs_path, version MLX5_1.25 version MLX5_1.25
+spark-fb97:23491:23491 [0] NCCL INFO dlvsym failed on mlx5dv_reg_dmabuf_mr - /lib/aarch64-linux-gnu/libmlx5.so: undefined symbol: mlx5dv_reg_dmabuf_mr, version MLX5_1.25 version MLX5_1.25
+spark-4440:24302:24302 [0] NCCL INFO NET/IB: [1] rocep1s0f1:uverbs1:1/RoCE provider=Mlx5 speed=200000 context=0xc53b90db27f0 pciPath=/sys/devices/pci0000:00/0000:00:00.0/0000:01:00.0 ar=0
+spark-4440:24302:24302 [0] NCCL INFO NET/IB : Made virtual device [0] name=rocep1s0f1 speed=200000 ndevs=1
+spark-fb97:23491:23491 [0] NCCL INFO NET/IB: [1] rocep1s0f1:uverbs1:1/RoCE provider=Mlx5 speed=200000 context=0xbca554388f70 pciPath=/sys/devices/pci0000:00/0000:00:00.0/0000:01:00.0 ar=0
+spark-fb97:23491:23491 [0] NCCL INFO NET/IB : Made virtual device [0] name=rocep1s0f1 speed=200000 ndevs=1
+spark-4440:24302:24302 [0] NCCL INFO NET/IB: [3] roceP2p1s0f1:uverbs3:1/RoCE provider=Mlx5 speed=200000 context=0xc53b90df3ef0 pciPath=/sys/devices/pci0002:00/0002:00:00.0/0002:01:00.0 ar=0
+spark-4440:24302:24302 [0] NCCL INFO NET/IB : Made virtual device [1] name=roceP2p1s0f1 speed=200000 ndevs=1
+spark-4440:24302:24302 [0] NCCL INFO NET/IB : Using [0]rocep1s0f1:1/RoCE [1]roceP2p1s0f1:1/RoCE [RO]; OOB enp1s0f1np1:192.168.100.16<0>
+spark-4440:24302:24302 [0] NCCL INFO Initialized NET plugin IB
+spark-4440:24302:24302 [0] NCCL INFO Assigned NET plugin IB to comm
+spark-4440:24302:24302 [0] NCCL INFO Assigned GIN plugin GIN_IB_GDAKI to comm
+spark-4440:24302:24302 [0] NCCL INFO Using network IB
+spark-fb97:23491:23491 [0] NCCL INFO NET/IB: [3] roceP2p1s0f1:uverbs3:1/RoCE provider=Mlx5 speed=200000 context=0xbca5543ca670 pciPath=/sys/devices/pci0002:00/0002:00:00.0/0002:01:00.0 ar=0
+spark-fb97:23491:23491 [0] NCCL INFO NET/IB : Made virtual device [1] name=roceP2p1s0f1 speed=200000 ndevs=1
+spark-fb97:23491:23491 [0] NCCL INFO NET/IB : Using [0]rocep1s0f1:1/RoCE [1]roceP2p1s0f1:1/RoCE [RO]; OOB enp1s0f1np1:192.168.100.15<0>
+spark-fb97:23491:23491 [0] NCCL INFO Initialized NET plugin IB
+spark-fb97:23491:23491 [0] NCCL INFO Assigned NET plugin IB to comm
+spark-fb97:23491:23491 [0] NCCL INFO Assigned GIN plugin GIN_IB_GDAKI to comm
+spark-fb97:23491:23491 [0] NCCL INFO Using network IB
+spark-4440:24302:24302 [0] NCCL INFO ncclCommInitRankConfig comm 0xc53b8f7f6ab0 rank 1 nranks 2 cudaDev 0 nvmlDev 0 busId f01000 commId 0x3470ca318760efc8 - Init START
+spark-fb97:23491:23491 [0] NCCL INFO ncclCommInitRankConfig comm 0xbca552dd2650 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId f01000 commId 0x3470ca318760efc8 - Init START
+spark-fb97:23491:23491 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+spark-4440:24302:24302 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+spark-fb97:23491:23491 [0] NCCL INFO NET/IB : GPU Direct RDMA Disabled for HCA 0 'rocep1s0f1'
+spark-4440:24302:24302 [0] NCCL INFO NET/IB : GPU Direct RDMA Disabled for HCA 0 'rocep1s0f1'
+spark-fb97:23491:23491 [0] NCCL INFO NET/IB : GPU Direct RDMA Disabled for HCA 1 'roceP2p1s0f1'
+spark-4440:24302:24302 [0] NCCL INFO NET/IB : GPU Direct RDMA Disabled for HCA 1 'roceP2p1s0f1'
+spark-fb97:23491:23491 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0).
+spark-4440:24302:24302 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0).
+spark-fb97:23491:23491 [0] NCCL INFO comm 0xbca552dd2650 rank 0 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 00/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 01/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 02/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 03/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 04/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 05/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 06/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 07/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 08/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 09/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 10/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 11/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 12/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 13/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 14/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 15/16 : 0 1
+spark-fb97:23491:23491 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] 1/-1/-1->0->-1 [2] 1/-1/-1->0->-1 [3] 1/-1/-1->0->-1 [4] 1/-1/-1->0->-1 [5] 1/-1/-1->0->-1 [6] 1/-1/-1->0->-1 [7] 1/-1/-1->0->-1 [8] -1/-1/-1->0->1 [9] -1/-1/-1->0->1 [10] -1/-1/-1->0->1 [11] -1/-1/-1->0->1 [12] -1/-1/-1->0->1 [13] -1/-1/-1->0->1 [14] -1/-1/-1->0->1 [15] -1/-1/-1->0->1
+spark-fb97:23491:23491 [0] NCCL INFO P2P Chunksize set to 131072
+spark-4440:24302:24302 [0] NCCL INFO comm 0xc53b8f7f6ab0 rank 1 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+spark-4440:24302:24302 [0] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] -1/-1/-1->1->0 [2] -1/-1/-1->1->0 [3] -1/-1/-1->1->0 [4] -1/-1/-1->1->0 [5] -1/-1/-1->1->0 [6] -1/-1/-1->1->0 [7] -1/-1/-1->1->0 [8] 0/-1/-1->1->-1 [9] 0/-1/-1->1->-1 [10] 0/-1/-1->1->-1 [11] 0/-1/-1->1->-1 [12] 0/-1/-1->1->-1 [13] 0/-1/-1->1->-1 [14] 0/-1/-1->1->-1 [15] 0/-1/-1->1->-1
+spark-4440:24302:24302 [0] NCCL INFO P2P Chunksize set to 131072
+spark-fb97:23491:23491 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+spark-fb97:23491:23491 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+spark-4440:24302:24302 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+spark-4440:24302:24302 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+spark-4440:24302:24310 [0] NCCL INFO [Proxy Service] Device 0 CPU core 0
+spark-fb97:23491:23501 [0] NCCL INFO [Proxy Service] Device 0 CPU core 0
+spark-fb97:23491:23502 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 0
+spark-4440:24302:24311 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 0
+spark-fb97:23491:23491 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+spark-fb97:23491:23491 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+spark-fb97:23491:23491 [0] NCCL INFO 16 coll channels, 16 collnet channels, 0 nvls channels, 16 p2p channels, 2 p2p channels per peer
+spark-fb97:23491:23491 [0] NCCL INFO CC Off, workFifoBytes 1048576
+spark-fb97:23491:23491 [0] NCCL INFO ncclCommInitRankConfig comm 0xbca552dd2650 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId f01000 commId 0x3470ca318760efc8 - Init COMPLETE
+spark-fb97:23491:23491 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 0 nranks 2 total 0.25 (kernels 0.18, alloc 0.06, bootstrap 0.01, allgathers 0.00, topo 0.00, graphs 0.00, connections 0.01, rest 0.00)
+spark-4440:24302:24302 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+spark-4440:24302:24302 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+spark-4440:24302:24302 [0] NCCL INFO 16 coll channels, 16 collnet channels, 0 nvls channels, 16 p2p channels, 2 p2p channels per peer
+spark-4440:24302:24302 [0] NCCL INFO ncclCommInitRankConfig comm 0xc53b8f7f6ab0 rank 1 nranks 2 cudaDev 0 nvmlDev 0 busId f01000 commId 0x3470ca318760efc8 - Init COMPLETE
+spark-4440:24302:24302 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 1 nranks 2 total 0.25 (kernels 0.17, alloc 0.05, bootstrap 0.02, allgathers 0.00, topo 0.00, graphs 0.00, connections 0.01, rest 0.00)
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong 
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)         
+spark-4440:24302:24312 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 0
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 0 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68000d20
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 0 from local rank 0, transport 2
+spark-fb97:23491:23503 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 0
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4000d20
+spark-4440:24302:24302 [0] NCCL INFO Channel 00/0 : 0[0] -> 1[0] [receive] via NET/IB/0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 00/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 1 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68000d98
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 1 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4000d98
+spark-4440:24302:24302 [0] NCCL INFO Channel 01/0 : 0[0] -> 1[0] [receive] via NET/IB/1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 01/0 : 1[0] -> 0[0] [receive] via NET/IB/1
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 2 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68000e10
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 2 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4000e10
+spark-4440:24302:24302 [0] NCCL INFO Channel 02/0 : 0[0] -> 1[0] [receive] via NET/IB/0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 02/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 3 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68000e88
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 3 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4000e88
+spark-4440:24302:24302 [0] NCCL INFO Channel 03/0 : 0[0] -> 1[0] [receive] via NET/IB/1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 03/0 : 1[0] -> 0[0] [receive] via NET/IB/1
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 4 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68000f00
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 4 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4000f00
+spark-4440:24302:24302 [0] NCCL INFO Channel 04/0 : 0[0] -> 1[0] [receive] via NET/IB/0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 04/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 5 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68000f78
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 5 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4000f78
+spark-fb97:23491:23491 [0] NCCL INFO Channel 05/0 : 1[0] -> 0[0] [receive] via NET/IB/1
+spark-4440:24302:24302 [0] NCCL INFO Channel 05/0 : 0[0] -> 1[0] [receive] via NET/IB/1
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 6 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4000ff0
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 6 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68000ff0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 06/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+spark-4440:24302:24302 [0] NCCL INFO Channel 06/0 : 0[0] -> 1[0] [receive] via NET/IB/0
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 7 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001068
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 7 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001068
+spark-fb97:23491:23491 [0] NCCL INFO Channel 07/0 : 1[0] -> 0[0] [receive] via NET/IB/1
+spark-4440:24302:24302 [0] NCCL INFO Channel 07/0 : 0[0] -> 1[0] [receive] via NET/IB/1
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 8 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f40010e0
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 8 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a680010e0
+spark-4440:24302:24302 [0] NCCL INFO Channel 08/0 : 0[0] -> 1[0] [receive] via NET/IB/0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 08/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 9 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001158
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 9 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001158
+spark-4440:24302:24302 [0] NCCL INFO Channel 09/0 : 0[0] -> 1[0] [receive] via NET/IB/1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 09/0 : 1[0] -> 0[0] [receive] via NET/IB/1
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 10 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f40011d0
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 10 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a680011d0
+spark-4440:24302:24302 [0] NCCL INFO Channel 10/0 : 0[0] -> 1[0] [receive] via NET/IB/0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 10/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 11 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001248
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 11 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001248
+spark-fb97:23491:23491 [0] NCCL INFO Channel 11/0 : 1[0] -> 0[0] [receive] via NET/IB/1
+spark-4440:24302:24302 [0] NCCL INFO Channel 11/0 : 0[0] -> 1[0] [receive] via NET/IB/1
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 12 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f40012c0
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 12 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a680012c0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 12/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+spark-4440:24302:24302 [0] NCCL INFO Channel 12/0 : 0[0] -> 1[0] [receive] via NET/IB/0
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 13 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001338
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 13 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001338
+spark-4440:24302:24302 [0] NCCL INFO Channel 13/0 : 0[0] -> 1[0] [receive] via NET/IB/1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 13/0 : 1[0] -> 0[0] [receive] via NET/IB/1
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 14 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f40013b0
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 14 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a680013b0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 14/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+spark-4440:24302:24302 [0] NCCL INFO Channel 14/0 : 0[0] -> 1[0] [receive] via NET/IB/0
+spark-fb97:23491:23501 [0] NCCL INFO New proxy recv connection 15 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001428
+spark-4440:24302:24310 [0] NCCL INFO New proxy recv connection 15 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001428
+spark-fb97:23491:23491 [0] NCCL INFO Channel 15/0 : 1[0] -> 0[0] [receive] via NET/IB/1
+spark-4440:24302:24302 [0] NCCL INFO Channel 15/0 : 0[0] -> 1[0] [receive] via NET/IB/1
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 16 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f40014a0
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 16 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a680014a0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 00/0 : 0[0] -> 1[0] [send] via NET/IB/0
+spark-4440:24302:24302 [0] NCCL INFO Channel 00/0 : 1[0] -> 0[0] [send] via NET/IB/0
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 17 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001518
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 17 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001518
+spark-fb97:23491:23491 [0] NCCL INFO Channel 01/0 : 0[0] -> 1[0] [send] via NET/IB/1
+spark-4440:24302:24302 [0] NCCL INFO Channel 01/0 : 1[0] -> 0[0] [send] via NET/IB/1
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 18 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001590
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 18 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001590
+spark-fb97:23491:23491 [0] NCCL INFO Channel 02/0 : 0[0] -> 1[0] [send] via NET/IB/0
+spark-4440:24302:24302 [0] NCCL INFO Channel 02/0 : 1[0] -> 0[0] [send] via NET/IB/0
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 19 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001608
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 19 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001608
+spark-fb97:23491:23491 [0] NCCL INFO Channel 03/0 : 0[0] -> 1[0] [send] via NET/IB/1
+spark-4440:24302:24302 [0] NCCL INFO Channel 03/0 : 1[0] -> 0[0] [send] via NET/IB/1
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 20 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001680
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 20 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001680
+spark-fb97:23491:23491 [0] NCCL INFO Channel 04/0 : 0[0] -> 1[0] [send] via NET/IB/0
+spark-4440:24302:24302 [0] NCCL INFO Channel 04/0 : 1[0] -> 0[0] [send] via NET/IB/0
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 21 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a680016f8
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 21 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f40016f8
+spark-4440:24302:24302 [0] NCCL INFO Channel 05/0 : 1[0] -> 0[0] [send] via NET/IB/1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 05/0 : 0[0] -> 1[0] [send] via NET/IB/1
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 22 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001770
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 22 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001770
+spark-4440:24302:24302 [0] NCCL INFO Channel 06/0 : 1[0] -> 0[0] [send] via NET/IB/0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 06/0 : 0[0] -> 1[0] [send] via NET/IB/0
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 23 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a680017e8
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 23 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f40017e8
+spark-4440:24302:24302 [0] NCCL INFO Channel 07/0 : 1[0] -> 0[0] [send] via NET/IB/1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 07/0 : 0[0] -> 1[0] [send] via NET/IB/1
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 24 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001860
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 24 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001860
+spark-4440:24302:24302 [0] NCCL INFO Channel 08/0 : 1[0] -> 0[0] [send] via NET/IB/0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 08/0 : 0[0] -> 1[0] [send] via NET/IB/0
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 25 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a680018d8
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 25 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f40018d8
+spark-4440:24302:24302 [0] NCCL INFO Channel 09/0 : 1[0] -> 0[0] [send] via NET/IB/1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 09/0 : 0[0] -> 1[0] [send] via NET/IB/1
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 26 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001950
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 26 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001950
+spark-4440:24302:24302 [0] NCCL INFO Channel 10/0 : 1[0] -> 0[0] [send] via NET/IB/0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 10/0 : 0[0] -> 1[0] [send] via NET/IB/0
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 27 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a680019c8
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 27 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f40019c8
+spark-4440:24302:24302 [0] NCCL INFO Channel 11/0 : 1[0] -> 0[0] [send] via NET/IB/1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 11/0 : 0[0] -> 1[0] [send] via NET/IB/1
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 28 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001a40
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 28 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001a40
+spark-4440:24302:24302 [0] NCCL INFO Channel 12/0 : 1[0] -> 0[0] [send] via NET/IB/0
+spark-fb97:23491:23491 [0] NCCL INFO Channel 12/0 : 0[0] -> 1[0] [send] via NET/IB/0
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 29 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001ab8
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 29 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001ab8
+spark-4440:24302:24302 [0] NCCL INFO Channel 13/0 : 1[0] -> 0[0] [send] via NET/IB/1
+spark-fb97:23491:23491 [0] NCCL INFO Channel 13/0 : 0[0] -> 1[0] [send] via NET/IB/1
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 30 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001b30
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 30 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001b30
+spark-fb97:23491:23491 [0] NCCL INFO Channel 14/0 : 0[0] -> 1[0] [send] via NET/IB/0
+spark-4440:24302:24302 [0] NCCL INFO Channel 14/0 : 1[0] -> 0[0] [send] via NET/IB/0
+spark-fb97:23491:23501 [0] NCCL INFO New proxy send connection 31 from local rank 0, transport 2
+spark-fb97:23491:23491 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xff89f4001ba8
+spark-4440:24302:24310 [0] NCCL INFO New proxy send connection 31 from local rank 0, transport 2
+spark-4440:24302:24302 [0] NCCL INFO Connected to proxy localRank 0 -> connection 0xfd9a68001ba8
+spark-fb97:23491:23491 [0] NCCL INFO Channel 15/0 : 0[0] -> 1[0] [send] via NET/IB/1
+spark-4440:24302:24302 [0] NCCL INFO Channel 15/0 : 1[0] -> 0[0] [send] via NET/IB/1
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 576 mtu 3 GID 3 (0/1064A8C0FFFF0000) fifoRkey=0x1b9e9c fifoLkey=0x1b9e9c
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 576 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 704 mtu 3 GID 0 (80FE/46442FFEFF47BB4E) fifoRkey=0x1ddcd6 fifoLkey=0x1ddcd6
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 704 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 577 mtu 3 GID 3 (0/1064A8C0FFFF0000) fifoRkey=0x1b9591 fifoLkey=0x1b9591
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 577 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 705 mtu 3 GID 0 (80FE/46442FFEFF47BB4E) fifoRkey=0x1dd0cc fifoLkey=0x1dd0cc
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 705 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 576 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 704 mtu 3 GID 0 (80FE/9DFB2FFEFF47BB4E) fifoRkey=0x1deeeb fifoLkey=0x1deeeb
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 704 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 578 mtu 3 GID 3 (0/F64A8C0FFFF0000) fifoRkey=0x1bbbb8 fifoLkey=0x1bbbb8
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 578 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 704 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 707 mtu 3 GID 0 (80FE/9DFB2FFEFF47BB4E) fifoRkey=0x1dece9 fifoLkey=0x1dece9
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 707 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 581 mtu 3 GID 3 (0/F64A8C0FFFF0000) fifoRkey=0x1bafac fifoLkey=0x1bafac
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 581 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 577 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 704 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 705 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 578 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 707 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 581 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 582 mtu 3 GID 3 (0/1064A8C0FFFF0000) fifoRkey=0x1beeeb fifoLkey=0x1beeeb
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 582 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 582 mtu 3 GID 3 (0/F64A8C0FFFF0000) fifoRkey=0x1ba7a5 fifoLkey=0x1ba7a5
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 582 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 582 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 582 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 710 mtu 3 GID 0 (80FE/9DFB2FFEFF47BB4E) fifoRkey=0x1deae7 fifoLkey=0x1deae7
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 710 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 585 mtu 3 GID 3 (0/F64A8C0FFFF0000) fifoRkey=0x1b9f9d fifoLkey=0x1b9f9d
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 585 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 710 mtu 3 GID 0 (80FE/46442FFEFF47BB4E) fifoRkey=0x1db6b2 fifoLkey=0x1db6b2
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 710 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 711 mtu 3 GID 0 (80FE/9DFB2FFEFF47BB4E) fifoRkey=0x1de7e6 fifoLkey=0x1de7e6
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 711 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 586 mtu 3 GID 3 (0/F64A8C0FFFF0000) fifoRkey=0x1b9795 fifoLkey=0x1b9795
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 586 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 712 mtu 3 GID 0 (80FE/9DFB2FFEFF47BB4E) fifoRkey=0x1de5e5 fifoLkey=0x1de5e5
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 712 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 585 mtu 3 GID 3 (0/1064A8C0FFFF0000) fifoRkey=0x1b7374 fifoLkey=0x1b7374
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 585 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 587 mtu 3 GID 3 (0/F64A8C0FFFF0000) fifoRkey=0x1b8d8c fifoLkey=0x1b8d8c
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 587 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 710 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 713 mtu 3 GID 0 (80FE/46442FFEFF47BB4E) fifoRkey=0x1d9b9d fifoLkey=0x1d9b9d
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 713 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 588 mtu 3 GID 3 (0/1064A8C0FFFF0000) fifoRkey=0x1b5e5c fifoLkey=0x1b5e5c
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 588 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 585 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 716 mtu 3 GID 0 (80FE/46442FFEFF47BB4E) fifoRkey=0x1d8c8c fifoLkey=0x1d8c8c
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 716 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 591 mtu 3 GID 3 (0/1064A8C0FFFF0000) fifoRkey=0x1b4442 fifoLkey=0x1b4442
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 591 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 711 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 710 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 586 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 585 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 712 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 587 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 713 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 588 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 716 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 591 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 719 mtu 3 GID 0 (80FE/46442FFEFF47BB4E) fifoRkey=0x1d7577 fifoLkey=0x1d7577
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 719 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 594 mtu 3 GID 3 (0/1064A8C0FFFF0000) fifoRkey=0x1b2d2a fifoLkey=0x1b2d2a
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 594 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 719 mtu 3 GID 0 (80FE/9DFB2FFEFF47BB4E) fifoRkey=0x1de4dd fifoLkey=0x1de4dd
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 719 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 720 mtu 3 GID 0 (80FE/46442FFEFF47BB4E) fifoRkey=0x1d6c6c fifoLkey=0x1d6c6c
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 720 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 594 mtu 3 GID 3 (0/F64A8C0FFFF0000) fifoRkey=0x1b6865 fifoLkey=0x1b6865
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 594 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 722 mtu 3 GID 0 (80FE/9DFB2FFEFF47BB4E) fifoRkey=0x1dd9d7 fifoLkey=0x1dd9d7
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 722 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 719 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 597 mtu 3 GID 3 (0/F64A8C0FFFF0000) fifoRkey=0x1b524f fifoLkey=0x1b524f
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 597 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 719 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 594 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 594 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 720 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 722 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 0 IbDev 0 Port 1 qpn 597 mtu 3 GID 3 (0/1064A8C0FFFF0000) fifoRkey=0x1bece9 fifoLkey=0x1bece9
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 597 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 597 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 725 mtu 3 GID 0 (80FE/9DFB2FFEFF47BB4E) fifoRkey=0x1ddbd1 fifoLkey=0x1ddbd1
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 725 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 0 Port 1 qpn 597 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: NCCL Dev 1 IbDev 1 Port 1 qpn 725 mtu 3 GID 0 (80FE/46442FFEFF47BB4E) fifoRkey=0x1d4a49 fifoLkey=0x1d4a49
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 725 query_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23501 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 725 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-4440:24302:24310 [0] NCCL INFO NET/IB: IbDev 1 Port 1 qpn 725 set_ece={supported=1, vendor_id=0x15b3, options=0x30000002, comp_mask=0x0}
+spark-fb97:23491:23491 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+spark-4440:24302:24302 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+  1073741824     134217728     float    none      -1  24414.9   43.98   21.99       0  24472.5   43.88   21.94       0
+spark-fb97:23491:23491 [0] NCCL INFO comm 0xbca552dd2650 rank 0 nranks 2 cudaDev 0 busId f01000 - Destroy COMPLETE
+spark-4440:24302:24302 [0] NCCL INFO comm 0xc53b8f7f6ab0 rank 1 nranks 2 cudaDev 0 busId f01000 - Destroy COMPLETE
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 21.9636 
+#
+# Collective test concluded: all_gather_perf
+#
+
+spark-4440:24302:24302 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
+spark-fb97:23491:23491 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
+mprg@spark-fb97:~/nccl-tests$ 
+```
 
 
 
