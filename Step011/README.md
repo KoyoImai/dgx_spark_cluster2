@@ -1212,4 +1212,6 @@ spark-fb97:23940:23940 [0] NCCL INFO Using network IB
 spark-4440:25264:25264 [0] NCCL INFO NET/IB : Using [0]rocep1s0f0:1/RoCE [1]roceP2p1s0f0:1/RoCE [RO]; OOB enp1s0f0np0:10.0.1.2<0>
 spark-4440:25264:25264 [0] NCCL INFO Using network IB
 ```
-上記の結果から，RoCE / RDMA系transportを使っているにもかかわらず，速度が 20〜22 GB/s ではなく 2.8 GB/s 程度に落ちていることがわかります．
+上記の結果から，RoCE / RDMA系transportを使っているにもかかわらず，速度が 20〜22 GB/s ではなく 2.8 GB/s 程度に落ちていることがわかる．
+
+
