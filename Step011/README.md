@@ -1198,15 +1198,16 @@ mprg@spark-fb97:~/nccl-tests$
 
 
 ### 1.10：結果の解釈
-1.9の結果を見る限り，TCPソケット通信をしているわけではなく，RDMA通信を行なっているようです．
-まず，低速化後のログでも，NCCLはRoCEデバイスを認識しています．
+1.9の結果を見る限り，TCPソケット通信をしているわけではなく，RDMA通信を行なっている．
+
+低速化後のログでも，NCCLはRoCEデバイスを認識している．
 ```
 spark-fb97:23940:23940 [0] NCCL INFO NET/IB: [0] rocep1s0f0:uverbs0:1/RoCE provider=Mlx5 speed=200000 context=0xc1abd84b7eb0 pciPath=/sys/devices/pci0000:00/0000:00:00.0/0000:01:00.0 ar=0
 spark-4440:25264:25264 [0] NCCL INFO NET/IB: [0] rocep1s0f0:uverbs0:1/RoCE provider=Mlx5 speed=200000 context=0xad6cd9442240 pciPath=/sys/devices/pci0000:00/0000:00:00.0/0000:01:00.0 ar=0
 spark-fb97:23940:23940 [0] NCCL INFO NET/IB: [2] roceP2p1s0f0:uverbs2:1/RoCE provider=Mlx5 speed=200000 context=0xc1abd84f95b0 pciPath=/sys/devices/pci0002:00/0002:00:00.0/0002:01:00.0 ar=0
 spark-4440:25264:25264 [0] NCCL INFO NET/IB: [2] roceP2p1s0f0:uverbs2:1/RoCE provider=Mlx5 speed=200000 context=0xad6cd9483940 pciPath=/sys/devices/pci0002:00/0002:00:00.0/0002:01:00.0 ar=0
 ```
-また，低速化後でも`NET/IB`トランスポートを使用しています．
+また，低速化後でも`NET/IB`トランスポートを使用している．
 ```
 spark-fb97:23940:23940 [0] NCCL INFO NET/IB : Using [0]rocep1s0f0:1/RoCE [1]roceP2p1s0f0:1/RoCE [RO]; OOB enp1s0f0np0:10.0.1.1<0>
 spark-fb97:23940:23940 [0] NCCL INFO Using network IB
@@ -1216,12 +1217,15 @@ spark-4440:25264:25264 [0] NCCL INFO Using network IB
 上記の結果から，RoCE / RDMA系transportを使っているにもかかわらず，速度が 20〜22 GB/s ではなく 2.8 GB/s 程度に落ちていることがわかる．
 
 
-### 1.11：通信速度低下の原因に対する仮説
+### 1.11：現状確認と通信速度低下の原因に対する仮説
 QSFPケーブルの接続変更前後で，RDMA通信を行なっているのは1.9と1.10で確認した．
+このことから，TCPソケット通信になってCPU周りでの処理がボトルネックになっているわけではないことは証明できている．
 RoCE/RDMA系transportを使用しているのに，通信速度が低下するということは，「RoCEが何らかの理由で本来の性能を発揮できなくなった」状態へと，QSFPケーブルの抜き差しで固定されてしまったと考えられる．
 それでは，どのような状態ならば，RoCEで速度が低下するのか．
 どういった現象が発生すれば，RoCEで速度が低下するのか．
 
 考えるべきは，QSFPケーブルの抜き差し前後でどのような挙動がDGX Spark内部で発生しているのか．
+
+### 1.12：QSFPケーブル抜き差し前後でのDGX Sparkの内部挙動
 
 
