@@ -61,7 +61,7 @@ LPDDR5x coherent unified system memoryとは，CPUとGPUがデータコピーの
 
 ## 起きている現象
 QSFPスイッチ，もしくはQSFPケーブルで直接接続したDGX Spark複数台でnccl-testを行う際，通信速度が低下する現象が発生する．
-現状判明していることは以下の通りです．
+現状判明していることは以下の通りで．
 
 - DGX Sparkを再起動した直後は，QSFPスイッチやQSFPケーブル直接接続のどちらでも妥当な通信速度を達成する（20GBps〜22GBps程度）．
 - QSFP接続の方式を変更すると，nccl-testの通信速度が低下する．約2.8Gbps〜3.2GBps程度で，RJ45の1.25GBpsよりは速いが，QSFPの理論値25GBpsよりも限りなく低速になる．
@@ -180,9 +180,9 @@ mprg@spark-fb97:~/nccl-tests$
 ```
 
 ### 1.3：結果の確認
-1.2のQSFPケーブル直結への切り替えで，nccl-testの通信速度が低下していることがわかります．
-具体的には，`Avg bus bandwidth : 21.4033`が`Avg bus bandwidth : 2.82151`まで低下します．
-またこの時，Active FEC encodingが`RS`から`None`へと変化していることも確認できます．
+1.2のQSFPケーブル直結への切り替えで，nccl-testの通信速度が低下していることがわかる．
+具体的には，`Avg bus bandwidth : 21.4033`が`Avg bus bandwidth : 2.82151`まで低下する．
+またこの時，Active FEC encodingが`RS`から`None`へと変化していることも確認できる．
 
 
 ### 1.4：Active FEC encodingが原因なのかを調査
@@ -240,9 +240,9 @@ mprg@spark-fb97:~/nccl-tests$
 ```
 
 ### 1.5：結果の確認
-FECをRS-FECに変更しても速度が変わらないため，FECは根本原因ではない可能性が高いです．
+FECをRS-FECに変更しても速度が変わらないため，FECは根本原因ではない可能性が高い．
 次の可能性として，RDMAを考える．
-RDMAは，CPUやOSを介さずにメモリ間で直接データをやりとりする技術です．
+RDMAは，CPUやOSを介さずにメモリ間で直接データをやりとりする技術のことである．
 可能性として，QSFPケーブルを差し替えた際に，なんらかの理由でRDMAが使用されず，代わりにSocket通信でCPUやOSを介した通信となってしまっているため，速度が低下している？
 ← そもそも，DGX Sparkはcpu-gpu統合メモリを使用しているのだがら，RDMAのようにCPUを介さずにGPUメモリで通信というのの意味がわからない．
 ~実際，DGX SparkはRDMA非対応．~
