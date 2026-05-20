@@ -185,6 +185,8 @@ FECをRS-FECに変更しても速度が変わらないため，FECは根本原�
 次の可能性として，RDMAを考える．
 RDMAは，CPUやOSを介さずにメモリ間で直接データをやりとりする技術です．
 可能性として，QSFPケーブルを差し替えた際に，なんらかの理由でRDMAが使用されず，代わりにSocket通信でCPUやOSを介した通信となってしまっているため，速度が低下している？
+← そもそも，DGX Sparkはcpu-gpu統合メモリを使用しているのだがら，RDMAのようにCPUを介さずにGPUメモリで通信というのの意味がわからない．
+実際，DGX SparkはRDMA非対応．
 
 ### 1.6：スイッチ接続に再度戻してnccl-test
 ```
@@ -247,6 +249,12 @@ mprg@spark-fb97:~/nccl-tests$ sudo ethtool --show-fec enp1s0f1np1
 FEC parameters for enp1s0f1np1:
 Supported/Configured FEC encodings: Auto
 Active FEC encoding: RS
- 
 ```
+
+### 1.8：現状の確認と仮説
+
+
+
+
+
 
