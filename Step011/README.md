@@ -6,7 +6,7 @@ QSFPスイッチ接続時に，通信速度（nccl-test）が低下する原因�
 
 
 ## メモ
-### スイッチ接続 & 再起動時
+### 1.1：スイッチ接続 & 再起動時
 ```
 # FEC の確認
 mprg@spark-fb97:~$ sudo ethtool --show-fec enp1s0f1np1
@@ -61,6 +61,17 @@ Authorization required, but no authorization protocol specified
 mprg@spark-fb97:~/nccl-tests$ 
 ```
 
+### 1.2：QSFPケーブルを直結に差し替え
+```
+mprg@spark-fb97:~/nccl-tests$ sudo ethtool --show-fec enp1s0f0np0
+FEC parameters for enp1s0f0np0:
+Supported/Configured FEC encodings: Auto
+Active FEC encoding: None
+mprg@spark-fb97:~/nccl-tests$ 
+```
+```
+
+```
 
 
 
