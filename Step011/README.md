@@ -1,7 +1,7 @@
 # ステップ11：QSFPスイッチの速度低下原因調査
 QSFPスイッチ接続時に，通信速度（nccl-test）が低下する原因を調査する．
 
-## 用語理解
+## 一般用語まとめ
 ### Network Interface Card (NIC)
 Network Interface Card (NIC)とは，パソコンやサーバーの中に物理的に存在する部品のことで，ネットワークと通信するための出入り口となる装置のことです．
 
@@ -14,11 +14,9 @@ rocep1s0f0 port 1 ==> enp1s0f0np0 (Down)
 rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
 ```
 
-
 ### Remote Direct Memory Access (RDMA)
 Remote Direct Memory Access (RDMA)とは，ネットワーク経由で接続されたコンピュータ間で，CPUやOSを介さずに直接メモリにアクセスする技術です．
 OSやCPUを介さないため，超低遅延と高いスループットを実現可能であり，PyTorchのNCCLでも使われています．
-
 
 ### RDMA over Converged Ethernet (RoCE)
 RDMA over Converged Ethernet (RoCE)は，RDMAをEthernet上で動かすための方式です．
@@ -32,9 +30,17 @@ DGX SparkのConnectX-7ポートはInfiniBand modeではなく，Ethernet configu
 ### GPUDirect RDMA
 [DGX SparkはGPUDirect RDMAに未対応です．](https://docs.nvidia.com/dgx/dgx-spark-porting-guide/porting/cuda.html)
 
+### Blackwell GPU
+NVIDIAが開発した次世代高性能GPUおよびそのアーキテクチャです．
+
 ### NVIDIA Collective Communication Library (NCCL)
 
 
+## DGX Spark関連の用語まとめ
+### NVLink-C2C
+NVLink-C2Cとは，DGX Sparkにも使用されるプロセッサ間を接続するための超高速・広帯域幅のチップ間インターコネクト技術です．
+DGX Sparkは，Grace CPUとBlackwell GPUを統合した，CPU-GPU統合メモリという方式をとっています．
+このCPU-GPU統合メモリの内部で，Grace CPUとBlackwell GPUを繋いでいるのがNVLink-C2Cです．
 
 
 
