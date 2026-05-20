@@ -3,7 +3,17 @@ QSFPスイッチ接続時に，通信速度（nccl-test）が低下する原因�
 
 ## 用語理解
 ### Network Interface Card
-Network Interface Card (NIC)とは，パソコンやサーバーの中に物理的に存在する部品のことで，ネットワークと通信するための出入り口となる装置である．
+Network Interface Card (NIC)とは，パソコンやサーバーの中に物理的に存在する部品のことで，ネットワークと通信するための出入り口となる装置のことです．
+
+DGX SparkにはConnectX-7 NICというものが用意されており，QSFPケーブルで接続可能です．
+`ibdev2netdev`コマンドを使用すると以下のように4つのポートが表示されると思います．
+```
+roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Down)
+roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Up)
+rocep1s0f0 port 1 ==> enp1s0f0np0 (Down)
+rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
+```
+
 
 
 ## 起きている現象
