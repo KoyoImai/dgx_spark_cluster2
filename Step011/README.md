@@ -20,6 +20,14 @@ Remote Direct Memory Access (RDMA)とは，ネットワーク経由で接続さ�
 OSやCPUを介さないため，超低遅延と高いスループットを実現可能であり，PyTorchのNCCLでも使われています．
 
 
+### RDMA over Converged Ethernet (RoCE)
+RDMA over Converged Ethernet (RoCE)は，RDMAをEthernet上で動かすための方式です．
+
+### InfiniBand
+InfiniBandは，HPC/AIクラスタ向けの高速ネットワーク企画です．
+Ethernetとは別系統のネットワークで，低遅延・高帯域・RDMAを前提にした通信に使われています．
+
+DGX SparkのConnectX-7ポートはInfiniBand modeではなく，Ethernet configurationのみに対応しています．
 
 ### GPUDirect RDMA
 [DGX SparkはGPUDirect RDMAに未対応です．](https://docs.nvidia.com/dgx/dgx-spark-porting-guide/porting/cuda.html)
