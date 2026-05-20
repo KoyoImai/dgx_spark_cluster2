@@ -128,5 +128,45 @@ Supported/Configured FEC encodings: RS
 Active FEC encoding: RS
 ```
 ```
+mprg@spark-fb97:~/nccl-tests$ cd ~/nccl-tests
+mpirun -np 2 \
+  -H 10.0.1.1:1,10.0.1.2:1 \
+  --mca oob_tcp_if_include enp1s0f0np0 \
+  --mca btl_tcp_if_include enp1s0f0np0 \
+  -x LD_LIBRARY_PATH \
+  -x NCCL_SOCKET_IFNAME=enp1s0f0np0 \
+  ./build/all_gather_perf -b 1G -e 4G -f 2 -n 50 -w 10 -g 1
+Authorization required, but no authorization protocol specified
 
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+# nccl-tests version 2.18.3 nccl-headers=22809 nccl-library=22809
+# Collective test starting: all_gather_perf
+# nThread 1 nGpus 1 minBytes 1073741824 maxBytes 4294967296 step: 2(factor) warmup iters: 10 iters: 50 agg iters: 1 validation: 1 graph: 0 unalign: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid 568339 on spark-fb97 device  0 [000f:01:00] NVIDIA GB10
+#  Rank  1 Group  0 Pid 567181 on spark-4440 device  0 [000f:01:00] NVIDIA GB10
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong 
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)         
+  1073741824     134217728     float    none      -1   191211    5.62    2.81       0   190000    5.65    2.83       0
+  2147483648     268435456     float    none      -1   381061    5.64    2.82       0   379159    5.66    2.83       0
+  4294967296     536870912     float    none      -1   760771    5.65    2.82       0   757765    5.67    2.83       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 2.8233 
+#
+# Collective test concluded: all_gather_perf
+#
+
+mprg@spark-fb97:~/nccl-tests$ 
 ```
