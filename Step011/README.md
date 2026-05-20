@@ -1,7 +1,7 @@
 # ステップ11：QSFPスイッチの速度低下原因調査
 QSFPスイッチ接続時に，通信速度（nccl-test）が低下する原因を調査する．
 
-## 一般用語まとめ
+## 前準備1：一般用語まとめ
 ### Network Interface Card (NIC)
 Network Interface Card (NIC)とは，パソコンやサーバーの中に物理的に存在する部品のことで，ネットワークと通信するための出入り口となる装置のことです．
 
@@ -36,7 +36,7 @@ NVIDIAが開発した次世代高性能GPUおよびそのアーキテクチャ�
 ### NVIDIA Collective Communication Library (NCCL)
 
 
-## DGX Spark関連の用語まとめ
+## 前準備2：DGX Spark関連の用語まとめ
 ### NVLink-C2C
 NVLink-C2Cとは，DGX Sparkにも使用されるプロセッサ間を接続するための超高速・広帯域幅のチップ間インターコネクト技術です．
 DGX Sparkは，Grace CPUとBlackwell GPUを統合した，CPU-GPU統合メモリという方式をとっています．
