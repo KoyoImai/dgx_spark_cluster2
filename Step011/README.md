@@ -766,6 +766,7 @@ mprg@spark-fb97:~/nccl-tests$
 
 <details>
 <summary>QSFP直結に切り替えてnccl-testを実行</summary>
+
 <pre><code>
 mprg@spark-fb97:~/nccl-tests$ DISPLAY= \
 mpirun -np 2 \
