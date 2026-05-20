@@ -18,6 +18,9 @@ rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
 Remote Direct Memory Access (RDMA)とは，ネットワーク経由で接続されたコンピュータ間で，CPUやOSを介さずに直接メモリにアクセスする技術です．
 OSやCPUを介さないため，超低遅延と高いスループットを実現可能であり，PyTorchのNCCLでも使われています．
 
+### Queue Pair (QP)
+Queue Pair (QP)とは，RDMAにおいて，データの送受信を行うためにペアで構成されるキューの仕組みです．
+
 ### RDMA over Converged Ethernet (RoCE)
 RDMA over Converged Ethernet (RoCE)は，RDMAをEthernet上で動かすための方式です．
 
@@ -307,7 +310,10 @@ Active FEC encoding: RS
 ```
 
 ### 1.8：現状の確認と仮説
-
+現状確認している事実は以下の通りです．
+- DGX Sparkを再起動した直後は，QSFPスイッチによる接続，もしくはQSFPケーブルの直接接続のどちらであっても理論値に近い通信速度を達成する．
+- QSFPケーブルでの接続方法を変更すると，接続方法によらず通信速度が低下する．
+- QSFpケーブルの接続方法を再起動時と同じ状態にしても通信速度は戻らず，再起動するまで低速な状態が続く．
 
 
 
