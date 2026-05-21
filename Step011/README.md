@@ -30,6 +30,9 @@ Ethernetとは別系統のネットワークで，低遅延・高帯域・RDMA�
 
 DGX SparkのConnectX-7ポートはInfiniBand modeではなく，Ethernet configurationのみに対応しています．
 
+### ConnectX-7
+ConnectX-7とは，AIやハイパフォーマンスコンピューティング（HPC）向けに設計された
+
 ### GPUDirect RDMA
 [DGX SparkはGPUDirect RDMAに未対応です．](https://docs.nvidia.com/dgx/dgx-spark-porting-guide/porting/cuda.html)
 
@@ -1200,6 +1203,10 @@ mprg@spark-fb97:~/nccl-tests$
 
 
 
+
+
+
+
 ### 1.10：結果の解釈
 1.9の結果を見る限り，TCPソケット通信をしているわけではなく，RDMA通信を行なっている．
 
@@ -1220,6 +1227,12 @@ spark-4440:25264:25264 [0] NCCL INFO Using network IB
 上記の結果から，RoCE / RDMA系transportを使っているにもかかわらず，速度が 20〜22 GB/s ではなく 2.8 GB/s 程度に落ちていることがわかる．
 
 
+
+
+
+
+
+
 ### 1.11：現状確認と通信速度低下の原因に対する仮説
 QSFPケーブルの接続変更前後で，RDMA通信を行なっているのは1.9と1.10で確認した．
 このことから，TCPソケット通信になってCPU周りでの処理がボトルネックになっているわけではないことは証明できている．
@@ -1228,6 +1241,13 @@ RoCE/RDMA系transportを使用しているのに，通信速度が低下する�
 どういった現象が発生すれば，RoCEで速度が低下するのか．
 
 考えるべきは，QSFPケーブルの抜き差し前後でどのような挙動がDGX Spark内部で発生しているのか．
+
+
+
+
+
+
+
 
 ### 1.12：QSFPケーブル抜き差し前後でのDGX Sparkの内部挙動
 ```
