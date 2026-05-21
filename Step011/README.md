@@ -1250,6 +1250,10 @@ RoCE/RDMA系transportを使用しているのに，通信速度が低下する�
 
 
 ### 1.12：QSFPケーブル抜き差し前後でのDGX Sparkの内部挙動
+<details>
+<summary>dmsegの結果</summary>
+
+<pre><code>
 ```
 mprg@spark-fb97:~/nccl-tests$ sudo dmesg -w
 [sudo] mprg のパスワード: 
@@ -2865,3 +2869,10 @@ mprg@spark-fb97:~/nccl-tests$ sudo dmesg -w
 [ 7208.507984] audit: type=1400 audit(1779277461.218:166): apparmor="DENIED" operation="capable" class="cap" profile="ubuntu_pro_esm_cache//cloud_id" pid=43708 comm="cloud-id" capability=38  capname="perfmon"
 ```
 
+</code></pre>
+</details>
+
+
+
+
+  
