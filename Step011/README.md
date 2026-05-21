@@ -36,6 +36,9 @@ DGX SparkのConnectX-7ポートはInfiniBand modeではなく，Ethernet configu
 ### Blackwell GPU
 NVIDIAが開発した次世代高性能GPUおよびそのアーキテクチャです．
 
+### PCIe
+PCIeとは，CPUとGPU，SSDなどの各種パーツを接続するデータ転送の規格です．
+
 ### NVIDIA Collective Communication Library (NCCL)
 
 
