@@ -2879,8 +2879,17 @@ mprg@spark-fb97:~/nccl-tests$ sudo dmesg -w
 
 
 
-### 1.13：QSFPケーブル差し替え前後のdmesgのログ
 
+
+
+
+
+
+
+
+
+### 1.13：QSFPケーブル差し替え前後のdmesgのログ
+<details>
 <summary>dmsegの結果</summary>
 
 <pre><code>
