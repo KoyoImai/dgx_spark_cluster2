@@ -40,7 +40,14 @@ ConnectX-7とは，AIやハイパフォーマンスコンピューティング�
 NVIDIAが開発した次世代高性能GPUおよびそのアーキテクチャです．
 
 ### PCIe
-PCIeとは，CPUとGPU，SSDなどの各種パーツを接続するデータ転送の規格です．
+PCIeとは，パソコンのマザーボード上でCPUとGPU，SSDなどの各種パーツを接続するデータ転送インターフェースの規格で，
+イメージとしては，CPUと各種パーツ間でデータのやり取りを行うための道路．
+
+### Write Combining（WC）
+Write Combining（WC）は，CPUがメモリやデバイスにデータを書き込む際の最適化技術です．
+WCがない場合，CPUが小さなデータを書き込むたびに毎回バスへ送信します．
+そのため，転送回数が多く非効率とります．
+WCを使う場合，複数の書き込みを一時的にバッファに溜め込んで，まとめて一回で送ることで転送回数を減らして効率を上げます．
 
 ### NVIDIA Collective Communication Library (NCCL)
 
@@ -2889,8 +2896,10 @@ mprg@spark-fb97:~/nccl-tests$ sudo dmesg -w
 
 
 ### 1.13：QSFPケーブル差し替え前後のdmesgのログ
+再起動時はQSFPケーブル直結
+
 <details>
-<summary>dmsegの結果</summary>
+<summary>QSFPケーブル差し替え前のdmsegの結果</summary>
 
 <pre><code>
 mprg@spark-fb97:~$ sudo dmesg -w
@@ -4320,6 +4329,173 @@ mprg@spark-fb97:~$ sudo dmesg -w
 [  871.176985] mlx5_core 0002:01:00.0: mlx5_core_test_wc:383:(pid 23341): Write combining is not supported
 [  871.185373] mlx5_core 0002:01:00.1: mlx5_core_test_wc:383:(pid 23341): Write combining is not supported
 [  871.363363] nvidia 000f:01:00.0: Using 40-bit DMA addresses
+
+</code></pre>
+</details>
+
+
+
+
+
+
+
+<details>
+<summary>QSFPケーブル差し替え前のdmsegの結果</summary>
+
+<pre><code>
+[ 2735.901338] mlx5_core 0000:01:00.0 enp1s0f0np0: Link down
+[ 2735.901820] mlx5_core 0002:01:00.0 enP2p1s0f0np0: Link down
+[ 2735.903339] mlx5_core 0000:01:00.0 rocep1s0f0: Port: 1 Link DOWN
+[ 2736.959153] mlx5_core 0002:01:00.0 roceP2p1s0f0: Port: 1 Link DOWN
+[ 2754.515414] mlx5_core 0002:01:00.0 enP2p1s0f0np0: Link up
+[ 2754.515688] mlx5_core 0000:01:00.0 enp1s0f0np0: Link up
+[ 2754.516200] mlx5_core 0000:01:00.0 rocep1s0f0: Port: 1 Link ACTIVE
+[ 2754.516212] mlx5_core 0002:01:00.0 roceP2p1s0f0: Port: 1 Link ACTIVE
+[ 2761.634151] mlx5_core 0000:01:00.0: Port module event: module 0, Cable unplugged
+[ 2761.634177] mlx5_core 0002:01:00.0: Port module event: module 0, Cable unplugged
+[ 2761.650042] mlx5_core 0002:01:00.0 enP2p1s0f0np0: Link down
+[ 2761.650074] mlx5_core 0000:01:00.0 enp1s0f0np0: Link down
+[ 2761.651232] mlx5_core 0002:01:00.0 roceP2p1s0f0: Port: 1 Link DOWN
+[ 2761.651997] mlx5_core 0000:01:00.0 rocep1s0f0: Port: 1 Link DOWN
+[ 2761.660598] mlx5_core 0000:01:00.0: E-Switch: Unload vfs: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2761.670362] mlx5_core 0000:01:00.0: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2767.219252] mlx5_core 0000:01:00.0: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2767.736634] mlx5_core 0000:01:00.0: E-Switch: cleanup
+[ 2768.072450] mlx5_core 0000:01:00.1: E-Switch: Unload vfs: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2768.092141] mlx5_core 0000:01:00.1: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2768.570971] mlx5_core 0000:01:00.1: Port module event: module 1, Cable plugged
+[ 2768.570994] mlx5_core 0002:01:00.1: Port module event: module 1, Cable plugged
+[ 2770.649758] mlx5_core 0000:01:00.1 enp1s0f1np1: Link up
+[ 2770.649813] mlx5_core 0002:01:00.1 enP2p1s0f1np1: Link up
+[ 2770.651248] mlx5_core 0002:01:00.1 roceP2p1s0f1: Port: 1 Link ACTIVE
+[ 2773.843943] mlx5_core 0000:01:00.1: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2774.535903] mlx5_core 0000:01:00.1: E-Switch: cleanup
+[ 2774.872129] mlx5_core 0002:01:00.0: E-Switch: Unload vfs: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2774.892905] mlx5_core 0002:01:00.0: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2778.421870] mlx5_core 0002:01:00.0: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2778.943960] mlx5_core 0002:01:00.0: E-Switch: cleanup
+[ 2779.260829] mlx5_core 0002:01:00.1: E-Switch: Unload vfs: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2779.280759] mlx5_core 0002:01:00.1: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2785.335654] mlx5_core 0002:01:00.1: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+[ 2785.892544] mlx5_core 0002:01:00.1: E-Switch: cleanup
+[ 2786.344197] cx7-pcie-hotplug MTKP0001:00: Cable removal
+[ 2786.344271] pcieport 0002:00:00.0: AER: Multiple Correctable error message received from 0002:00:00.0
+[ 2786.344296] pcieport 0002:00:00.0: PCIe Bus Error: severity=Correctable, type=Physical Layer, (Receiver ID)
+[ 2786.344297] pcieport 0000:00:00.0: AER: Multiple Correctable error message received from 0000:00:00.0
+[ 2786.344298] pcieport 0002:00:00.0:   device [10de:22ce] error status/mask=00000001/0000e000
+[ 2786.344300] pcieport 0002:00:00.0:    [ 0] RxErr                  (First)
+[ 2786.344308] pcieport 0000:00:00.0: PCIe Bus Error: severity=Correctable, type=Physical Layer, (Receiver ID)
+[ 2786.344310] pcieport 0000:00:00.0:   device [10de:22ce] error status/mask=00000001/0000e000
+[ 2786.344312] pcieport 0000:00:00.0:    [ 0] RxErr                  (First)
+[ 2789.356067] cx7-pcie-hotplug MTKP0001:00: Cable plugin
+[ 2791.055848] pcieport 0000:00:00.0: AER: Multiple Correctable error message received from 0000:ff:1f.7 (no details found
+[ 2791.055865] pcieport 0000:00:00.0: AER: Multiple Uncorrectable (Fatal) error message received from 0000:ff:1f.7 (no details found
+[ 2791.066888] pcieport 0002:00:00.0: AER: Multiple Correctable error message received from 0002:ff:1f.7 (no details found
+[ 2791.066903] pcieport 0002:00:00.0: AER: Multiple Uncorrectable (Fatal) error message received from 0002:ff:1f.7 (no details found
+[ 2792.358582] pci 0000:01:00.0: [15b3:1021] type 00 class 0x020000 PCIe Endpoint
+[ 2792.358842] pci 0000:01:00.0: BAR 0 [mem 0x00000000-0x01ffffff 64bit pref]
+[ 2792.358873] pci 0000:01:00.0: ROM [mem 0x00000000-0x000fffff pref]
+[ 2792.359763] pci 0000:01:00.0: PME# supported from D3cold
+[ 2792.360122] pci 0000:01:00.0: VF BAR 0 [mem 0x00000000-0x000fffff 64bit pref]
+[ 2792.360124] pci 0000:01:00.0: VF BAR 0 [mem 0x00000000-0x007fffff 64bit pref]: contains BAR 0 for 8 VFs
+[ 2792.361541] pci 0000:01:00.0: Adding to iommu group 7
+[ 2792.361618] pcieport 0000:00:00.0: Max Payload Size set to  512/ 512 (was  512), Max Read Rq  512
+[ 2792.361670] pci 0000:01:00.0: Max Payload Size set to  512/ 512 (was  128), Max Read Rq  512
+[ 2792.362012] pci 0000:01:00.1: [15b3:1021] type 00 class 0x020000 PCIe Endpoint
+[ 2792.362247] pci 0000:01:00.1: BAR 0 [mem 0x00000000-0x01ffffff 64bit pref]
+[ 2792.362277] pci 0000:01:00.1: ROM [mem 0x00000000-0x000fffff pref]
+[ 2792.362880] pci 0000:01:00.1: PME# supported from D3cold
+[ 2792.363220] pci 0000:01:00.1: VF BAR 0 [mem 0x00000000-0x000fffff 64bit pref]
+[ 2792.363222] pci 0000:01:00.1: VF BAR 0 [mem 0x00000000-0x007fffff 64bit pref]: contains BAR 0 for 8 VFs
+[ 2792.364100] pci 0000:01:00.1: Adding to iommu group 8
+[ 2792.364151] pcieport 0000:00:00.0: Max Payload Size set to  512/ 512 (was  512), Max Read Rq  512
+[ 2792.364203] pci 0000:01:00.0: Max Payload Size set to  512/ 512 (was  512), Max Read Rq  512
+[ 2792.364252] pci 0000:01:00.1: Max Payload Size set to  512/ 512 (was  128), Max Read Rq  512
+[ 2792.364411] pci 0000:01:00.0: BAR 0 [mem 0x7500000000-0x7501ffffff 64bit pref]: assigned
+[ 2792.364462] pci 0000:01:00.1: BAR 0 [mem 0x7502000000-0x7503ffffff 64bit pref]: assigned
+[ 2792.364514] pci 0000:01:00.0: ROM [mem 0x67100000-0x671fffff pref]: assigned
+[ 2792.364516] pci 0000:01:00.0: VF BAR 0 [mem 0x7504000000-0x75047fffff 64bit pref]: assigned
+[ 2792.364547] pci 0000:01:00.1: ROM [mem 0x67200000-0x672fffff pref]: assigned
+[ 2792.364549] pci 0000:01:00.1: VF BAR 0 [mem 0x7504800000-0x7504ffffff 64bit pref]: assigned
+[ 2792.367378] mlx5_core 0000:01:00.0: enabling device (0000 -> 0002)
+[ 2792.367501] mlx5_core 0000:01:00.0: firmware version: 28.45.4028
+[ 2792.367520] mlx5_core 0000:01:00.0: 126.028 Gb/s available PCIe bandwidth (32.0 GT/s PCIe x4 link)
+[ 2792.741908] mlx5_core 0000:01:00.0: Rate limit: 127 rates are supported, range: 0Mbps to 195312Mbps
+[ 2792.742606] mlx5_core 0000:01:00.0: E-Switch: Total vports 10, per vport: max uc(128) max mc(2048)
+[ 2792.744979] mlx5_core 0000:01:00.0: Flow counters bulk query buffer size increased, bulk_query_len(8)
+[ 2792.748254] mlx5_core 0000:01:00.0: Port module event: module 0, Cable unplugged
+[ 2792.748694] mlx5_core 0000:01:00.0: mlx5_pcie_event:322:(pid 23874): PCIe slot power capability was not advertised.
+[ 2792.757575] mlx5_core 0000:01:00.0: mlx5e: IPSec ESP acceleration enabled
+[ 2792.923416] mlx5_core 0000:01:00.0: MLX5E: StrdRq(1) RqSz(8) StrdSz(2048) RxCqeCmprss(0 enhanced)
+[ 2792.925316] mlx5_core 0000:01:00.0 enp1s0f0np0: renamed from eth0
+[ 2792.947236] mlx5_core 0000:01:00.1: enabling device (0000 -> 0002)
+[ 2792.947717] mlx5_core 0000:01:00.1: firmware version: 28.45.4028
+[ 2792.947765] mlx5_core 0000:01:00.1: 126.028 Gb/s available PCIe bandwidth (32.0 GT/s PCIe x4 link)
+[ 2793.447878] mlx5_core 0000:01:00.1: Rate limit: 127 rates are supported, range: 0Mbps to 195312Mbps
+[ 2793.448669] mlx5_core 0000:01:00.1: E-Switch: Total vports 10, per vport: max uc(128) max mc(2048)
+[ 2793.450033] mlx5_core 0000:01:00.0 enp1s0f0np0: Link down
+[ 2793.450346] mlx5_core 0000:01:00.1: Flow counters bulk query buffer size increased, bulk_query_len(8)
+[ 2793.458374] mlx5_core 0000:01:00.1: mlx5_pcie_event:322:(pid 24100): PCIe slot power capability was not advertised.
+[ 2793.462710] mlx5_core 0000:01:00.1: mlx5e: IPSec ESP acceleration enabled
+[ 2793.585978] mlx5_core 0000:01:00.1: MLX5E: StrdRq(1) RqSz(8) StrdSz(2048) RxCqeCmprss(0 enhanced)
+[ 2793.587802] mlx5_core 0000:01:00.1 enp1s0f1np1: renamed from eth0
+[ 2793.608463] pci 0002:01:00.0: [15b3:1021] type 00 class 0x020000 PCIe Endpoint
+[ 2793.608839] pci 0002:01:00.0: BAR 0 [mem 0x00000000-0x01ffffff 64bit pref]
+[ 2793.608890] pci 0002:01:00.0: ROM [mem 0x00000000-0x000fffff pref]
+[ 2793.610013] pci 0002:01:00.0: PME# supported from D3cold
+[ 2793.610444] pci 0002:01:00.0: VF BAR 0 [mem 0x00000000-0x000fffff 64bit pref]
+[ 2793.610445] pci 0002:01:00.0: VF BAR 0 [mem 0x00000000-0x007fffff 64bit pref]: contains BAR 0 for 8 VFs
+[ 2793.612123] pci 0002:01:00.0: Adding to iommu group 10
+[ 2793.612173] pcieport 0002:00:00.0: Max Payload Size set to  512/ 512 (was  512), Max Read Rq  512
+[ 2793.612234] pci 0002:01:00.0: Max Payload Size set to  512/ 512 (was  128), Max Read Rq  512
+[ 2793.612687] pci 0002:01:00.1: [15b3:1021] type 00 class 0x020000 PCIe Endpoint
+[ 2793.612966] pci 0002:01:00.1: BAR 0 [mem 0x00000000-0x01ffffff 64bit pref]
+[ 2793.613002] pci 0002:01:00.1: ROM [mem 0x00000000-0x000fffff pref]
+[ 2793.613784] pci 0002:01:00.1: PME# supported from D3cold
+[ 2793.614231] pci 0002:01:00.1: VF BAR 0 [mem 0x00000000-0x000fffff 64bit pref]
+[ 2793.614232] pci 0002:01:00.1: VF BAR 0 [mem 0x00000000-0x007fffff 64bit pref]: contains BAR 0 for 8 VFs
+[ 2793.615232] pci 0002:01:00.1: Adding to iommu group 11
+[ 2793.615269] pcieport 0002:00:00.0: Max Payload Size set to  512/ 512 (was  512), Max Read Rq  512
+[ 2793.615341] pci 0002:01:00.0: Max Payload Size set to  512/ 512 (was  512), Max Read Rq  512
+[ 2793.615402] pci 0002:01:00.1: Max Payload Size set to  512/ 512 (was  128), Max Read Rq  512
+[ 2793.615585] pci 0002:01:00.0: BAR 0 [mem 0x3d00000000-0x3d01ffffff 64bit pref]: assigned
+[ 2793.615663] pci 0002:01:00.1: BAR 0 [mem 0x3d02000000-0x3d03ffffff 64bit pref]: assigned
+[ 2793.615738] pci 0002:01:00.0: ROM [mem 0x5d100000-0x5d1fffff pref]: assigned
+[ 2793.615739] pci 0002:01:00.0: VF BAR 0 [mem 0x3d04000000-0x3d047fffff 64bit pref]: assigned
+[ 2793.615779] pci 0002:01:00.1: ROM [mem 0x5d200000-0x5d2fffff pref]: assigned
+[ 2793.615780] pci 0002:01:00.1: VF BAR 0 [mem 0x3d04800000-0x3d04ffffff 64bit pref]: assigned
+[ 2793.617537] mlx5_core 0002:01:00.0: enabling device (0000 -> 0002)
+[ 2793.617731] mlx5_core 0002:01:00.0: firmware version: 28.45.4028
+[ 2793.617758] mlx5_core 0002:01:00.0: 126.028 Gb/s available PCIe bandwidth (32.0 GT/s PCIe x4 link)
+[ 2794.111255] mlx5_core 0000:01:00.1: Port module event: module 1, Cable plugged
+[ 2794.112144] mlx5_core 0000:01:00.1: mlx5_pcie_event:326:(pid 23874): Detected insufficient power on the PCIe slot (27W).
+[ 2794.112805] mlx5_core 0002:01:00.0: Rate limit: 127 rates are supported, range: 0Mbps to 195312Mbps
+[ 2794.113018] mlx5_core 0002:01:00.0: E-Switch: Total vports 10, per vport: max uc(128) max mc(2048)
+[ 2794.115075] mlx5_core 0002:01:00.0: Flow counters bulk query buffer size increased, bulk_query_len(8)
+[ 2794.117099] mlx5_core 0000:01:00.1 enp1s0f1np1: Link down
+[ 2794.125216] mlx5_core 0000:01:00.0: mlx5_pcie_event:326:(pid 24100): Detected insufficient power on the PCIe slot (27W).
+[ 2794.126126] mlx5_core 0002:01:00.0: Port module event: module 0, Cable unplugged
+[ 2794.126331] mlx5_core 0002:01:00.0: mlx5_pcie_event:326:(pid 24100): Detected insufficient power on the PCIe slot (27W).
+[ 2794.128233] mlx5_core 0002:01:00.0: mlx5e: IPSec ESP acceleration enabled
+[ 2794.278365] mlx5_core 0002:01:00.0: MLX5E: StrdRq(1) RqSz(8) StrdSz(2048) RxCqeCmprss(0 enhanced)
+[ 2794.280046] mlx5_core 0002:01:00.0 enP2p1s0f0np0: renamed from eth0
+[ 2794.303323] mlx5_core 0002:01:00.1: enabling device (0000 -> 0002)
+[ 2794.303679] mlx5_core 0002:01:00.1: firmware version: 28.45.4028
+[ 2794.303728] mlx5_core 0002:01:00.1: 126.028 Gb/s available PCIe bandwidth (32.0 GT/s PCIe x4 link)
+[ 2794.772342] mlx5_core 0002:01:00.0 enP2p1s0f0np0: Link down
+[ 2794.807425] mlx5_core 0002:01:00.1: Rate limit: 127 rates are supported, range: 0Mbps to 195312Mbps
+[ 2794.807580] mlx5_core 0002:01:00.1: E-Switch: Total vports 10, per vport: max uc(128) max mc(2048)
+[ 2794.808326] mlx5_core 0002:01:00.1: Flow counters bulk query buffer size increased, bulk_query_len(8)
+[ 2794.820686] mlx5_core 0002:01:00.1: mlx5e: IPSec ESP acceleration enabled
+[ 2794.827459] mlx5_core 0002:01:00.1: Port module event: module 1, Cable plugged
+[ 2794.827756] mlx5_core 0002:01:00.1: mlx5_pcie_event:326:(pid 472): Detected insufficient power on the PCIe slot (27W).
+[ 2794.996487] mlx5_core 0002:01:00.1: MLX5E: StrdRq(1) RqSz(8) StrdSz(2048) RxCqeCmprss(0 enhanced)
+[ 2794.998013] mlx5_core 0002:01:00.1 enP2p1s0f1np1: renamed from eth0
+[ 2795.496607] mlx5_core 0002:01:00.1 enP2p1s0f1np1: Link down
+[ 2796.118414] mlx5_core 0000:01:00.1 enp1s0f1np1: Link up
+[ 2796.118914] mlx5_core 0002:01:00.1 enP2p1s0f1np1: Link up
+[ 2796.119740] mlx5_core 0000:01:00.1 rocep1s0f1: Port: 1 Link ACTIVE
+[ 2796.120095] mlx5_core 0002:01:00.1 roceP2p1s0f1: Port: 1 Link ACTIVE
 
 </code></pre>
 </details>
