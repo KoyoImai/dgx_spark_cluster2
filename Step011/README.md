@@ -4340,7 +4340,7 @@ mprg@spark-fb97:~$ sudo dmesg -w
 
 
 <details>
-<summary>QSFPケーブル差し替え前のdmsegの結果</summary>
+<summary>QSFPケーブル差し替え後のdmsegの結果</summary>
 
 <pre><code>
 [ 2735.901338] mlx5_core 0000:01:00.0 enp1s0f0np0: Link down
